@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 
 
-def pinta_distribucion_categoricas(df, columnas_categoricas, relativa=False, mostrar_valores=False, giro = 45):
+def pinta_distribucion_categoricas(df, columnas_categoricas, relativa=False, mostrar_valores=True, giro = 45):
     num_columnas = len(columnas_categoricas)
     num_filas = (num_columnas // 2) + (num_columnas % 2)
 
@@ -315,4 +315,3 @@ def plot_multiple_boxplots(df, columns, dim_matriz_visual = 2):
 
     plt.tight_layout()
     plt.show()
-
