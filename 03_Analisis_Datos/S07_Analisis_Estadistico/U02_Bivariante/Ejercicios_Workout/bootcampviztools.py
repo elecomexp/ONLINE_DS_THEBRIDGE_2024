@@ -225,7 +225,7 @@ def plot_grouped_histograms(df, cat_col, num_col, group_size):
 
 
 
-def grafico_dispersion_con_correlacion(df, columna_x, columna_y, tamano_puntos=50, mostrar_correlacion=False):
+def grafico_dispersion_con_correlacion(df, columna_x, columna_y, tamano_puntos=50, mostrar_correlacion=True):
     """
     Crea un diagrama de dispersión entre dos columnas y opcionalmente muestra la correlación.
 
