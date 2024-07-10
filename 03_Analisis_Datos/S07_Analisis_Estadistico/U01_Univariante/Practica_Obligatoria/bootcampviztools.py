@@ -163,6 +163,9 @@ def plot_categorical_numerical_relationship(df, categorical_col, numerical_col, 
 
 
 def plot_combined_graphs(df, columns, whisker_width=1.5, bins = None):
+    '''
+    Dibuja histograma, KDE, y diagrama de cajas
+    '''
     num_cols = len(columns)
     if num_cols:
         
