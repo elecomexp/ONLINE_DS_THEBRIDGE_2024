@@ -1,4 +1,6 @@
+import matplotlib.pyplot as plt
 import pandas as pd
+import seaborn as sns
 
 import scipy.stats
 
@@ -22,3 +24,17 @@ def get_cardinality_class(df_in, umbral_categoria, umbral_continua):
 scipy.stats.mannwhitneyu()
 
 scipy.stats.f_oneway()
+
+def mapa_calor(corr_matrix):
+    '''
+    Hay que introducir una matriz de correlación generada con pandas
+    '''
+    plt.figure(figsize=(10, 8))  # Ya lo veremos pero esto permite ajustar el tamaño de las gráficas
+    sns.heatmap(corr_matrix, annot=True, fmt=".2f", cmap="coolwarm", 
+                cbar=True, square=True, linewidths=.5) # el cmap es el rango de colores usado para representar "el calor"
+
+    plt.title('Matriz de Correlación')
+    plt.xticks(rotation=45)  # Rota las etiquetas de las x si es necesario
+    plt.yticks(rotation=45)  # Rota las etiquetas de las y si es necesario
+
+    plt.show()
