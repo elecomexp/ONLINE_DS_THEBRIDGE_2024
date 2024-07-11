@@ -5,7 +5,7 @@ import seaborn as sns
 import scipy.stats
 
 
-def get_cardinality_class(df_in, umbral_categoria, umbral_continua):
+def get_cardinality_class(df_in, umbral_categoria = 10, umbral_continua = 30):
     '''
     Define qué tipo de variable es cada columna de un pandas.DataFrame en función de su cardinalidad.
     '''
@@ -19,6 +19,19 @@ def get_cardinality_class(df_in, umbral_categoria, umbral_continua):
     df_out.loc[df_out["%_Card"] > umbral_continua, "Clase"] = "Numérica Continua"
     
     return df_out
+
+
+
+def coeficiente_variación(df):
+    '''
+    Devuelve un pandas.DataFrame con la media, la desviación estándar (ro), 
+    en las mismas unidades que la media y su coeficiente de variación (CV)
+    '''
+    df_var = df.describe().loc[['std', 'mean']].T
+    df_var['CV'] = df_var['std'] / df_var['mean']
+    return df_var
+
+
 
 
 scipy.stats.mannwhitneyu()
