@@ -1,5 +1,8 @@
 import pandas as pd
 
+import scipy.stats
+
+
 def get_cardinality_class(df_in, umbral_categoria, umbral_continua):
     '''
     Define qué tipo de variable es cada columna de un pandas.DataFrame en función de su cardinalidad.
@@ -14,3 +17,8 @@ def get_cardinality_class(df_in, umbral_categoria, umbral_continua):
     df_out.loc[df_out["%_Card"] > umbral_continua, "Clase"] = "Numérica Continua"
     
     return df_out
+
+
+scipy.stats.mannwhitneyu()
+
+scipy.stats.f_oneway()
