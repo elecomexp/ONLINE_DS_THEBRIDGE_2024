@@ -4,7 +4,7 @@ import seaborn as sns
 
 import scipy.stats
 
-def get_cardinality_class(df_in, umbral_categoria, umbral_continua):
+def get_cardinality_class(df_in, umbral_categoria = 10, umbral_continua = 20):
     '''
     Define qué tipo de variable es cada columna de un pandas.DataFrame en función de su cardinalidad.
     '''
