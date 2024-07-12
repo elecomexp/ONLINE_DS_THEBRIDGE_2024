@@ -4,16 +4,19 @@ import pandas as pd
 import numpy as np
 
 
-def pinta_distribucion_categoricas(df, columnas_categoricas, relativa=False, mostrar_valores=True, giro = 45):
-    num_columnas = len(columnas_categoricas)
+def plot_categorical_distribution(df, categorical_columns, relative=False, show_values=True, rotation = 45):
+    '''
+    Dibuja diagramas de barras
+    '''
+    num_columnas = len(categorical_columns)
     num_filas = (num_columnas // 2) + (num_columnas % 2)
 
     fig, axes = plt.subplots(num_filas, 2, figsize=(15, 5 * num_filas))
     axes = axes.flatten() 
 
-    for i, col in enumerate(columnas_categoricas):
+    for i, col in enumerate(categorical_columns):
         ax = axes[i]
-        if relativa:
+        if relative:
             total = df[col].value_counts().sum()
             serie = df[col].value_counts().apply(lambda x: x / total)
             sns.barplot(x=serie.index, y=serie, ax=ax, palette='viridis', hue = serie.index, legend = False)
@@ -25,9 +28,9 @@ def pinta_distribucion_categoricas(df, columnas_categoricas, relativa=False, mos
 
         ax.set_title(f'Distribución de {col}')
         ax.set_xlabel('')
-        ax.tick_params(axis='x', rotation=giro)
+        ax.tick_params(axis='x', rotation=rotation)
 
-        if mostrar_valores:
+        if show_values:
             for p in ax.patches:
                 height = p.get_height()
                 ax.annotate(f'{height:.2f}', (p.get_x() + p.get_width() / 2., height), 
@@ -162,7 +165,7 @@ def plot_categorical_numerical_relationship(df, categorical_col, numerical_col, 
         plt.show()
 
 
-def plot_combined_graphs(df, columns, whisker_width=1.5, bins = None):
+def plot_histogram_KDE_boxPlot(df, columns, whisker_width=1.5, bins = None):
     num_cols = len(columns)
     if num_cols:
         
@@ -188,7 +191,7 @@ def plot_combined_graphs(df, columns, whisker_width=1.5, bins = None):
         plt.tight_layout()
         plt.show()
 
-def plot_grouped_boxplots(df, cat_col, num_col, group_size = 5):
+def plot_grouped_boxPlots(df, cat_col, num_col, group_size = 5):
     unique_cats = df[cat_col].unique()
     num_cats = len(unique_cats)
 
@@ -225,7 +228,7 @@ def plot_grouped_histograms(df, cat_col, num_col, group_size):
 
 
 
-def grafico_dispersion_con_correlacion(df, columna_x, columna_y, tamano_puntos=50, mostrar_correlacion=True):
+def plot_dispersion_with_correlation(df, columna_x, columna_y, tamano_puntos=50, mostrar_correlacion=True):
     """
     Crea un diagrama de dispersión entre dos columnas y opcionalmente muestra la correlación.
 
@@ -252,7 +255,7 @@ def grafico_dispersion_con_correlacion(df, columna_x, columna_y, tamano_puntos=5
     plt.show()
 
 
-def bubble_plot(df, col_x, col_y, col_size, scale = 1000):
+def plot_bubblePlot(df, col_x, col_y, col_size, scale = 1000):
     """
     Crea un scatter plot usando dos columnas para los ejes X e Y,
     y una tercera columna para determinar el tamaño de los puntos.
@@ -317,7 +320,7 @@ def plot_multiple_boxplots(df, columns, dim_matriz_visual = 2):
     plt.show()
 
 
-def scatter_plots_agrupados(df, col_categoria, col_num1, col_num2):
+def scatter_plots_merged(df, col_categoria, col_num1, col_num2):
     """
     Genera scatter plots superpuestos de dos columnas numéricas, 
     agrupados y coloreados según una columna categórica.
