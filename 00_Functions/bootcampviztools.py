@@ -3,32 +3,65 @@ import seaborn as sns
 import pandas as pd
 import numpy as np
 
-
-def plot_categorical_distribution(df, categorical_columns, relative=False, show_values=True, rotation = 45):
+def plot_multiple_categorical_distributions(df,
+                                            categorical_columns,
+                                            *, 
+                                            relative = False, 
+                                            show_values = True, 
+                                            rotation = 45, 
+                                            palette = 'viridis'
+                                            ) -> None:
     '''
-    Dibuja diagramas de barras
-    '''
-    num_columnas = len(categorical_columns)
-    num_filas = (num_columnas // 2) + (num_columnas % 2)
+    Plot a bar-graphs matrix, with 2 columns and the rows needed to plot the
+    `absolute` or `relative` frequency from the categorical columns of `df`.
+    
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        pandas.DataFrame
 
-    fig, axes = plt.subplots(num_filas, 2, figsize=(15, 5 * num_filas))
-    axes = axes.flatten() 
+    categorical_columns : list
+        Categorical columns   
+
+    relative : bool, optional
+        If True, it plots Relative Frecuency.
+        
+    show_values : bool, optional
+        If True, show numerical values over each bar.
+        
+    rotation : int, optional
+        X-Tick label rotation.
+        
+    palette : None, palette name, list, or dict, optional
+        Colors to use for the different levels of the hue variable. 
+        Should be something that can be interpreted by color_palette(), 
+        or a dictionary mapping hue levels to matplotlib colors. 
+    '''
+    num_columns = len(categorical_columns)
+    num_rows = (num_columns // 2) + (num_columns % 2)
+
+    if num_columns == 1:
+        fig, ax = plt.subplots(1, 1, figsize=(7, 5))
+    else:
+        fig, axs = plt.subplots(num_rows, 2, figsize=(15, 5 * num_rows))
+        axs = axs.flatten()     # Return a copy of the array collapsed into one dimension.
 
     for i, col in enumerate(categorical_columns):
-        ax = axes[i]
-        if relative:
+        if num_columns > 1:
+            ax = axs[i]
+        if relative:    
             total = df[col].value_counts().sum()
             serie = df[col].value_counts().apply(lambda x: x / total)
-            sns.barplot(x=serie.index, y=serie, ax=ax, palette='viridis', hue = serie.index, legend = False)
-            ax.set_ylabel('Frecuencia Relativa')
+            sns.barplot(x = serie.index, y = serie, ax = ax, palette = palette, hue = serie.index, legend = False)
+            ax.set_ylabel('Relative Frequency')
         else:
             serie = df[col].value_counts()
-            sns.barplot(x=serie.index, y=serie, ax=ax, palette='viridis', hue = serie.index, legend = False)
-            ax.set_ylabel('Frecuencia')
+            sns.barplot( x = serie.index, y = serie, ax = ax, palette = palette, hue = serie.index, legend = False)
+            ax.set_ylabel('Frecuency')
 
-        ax.set_title(f'Distribución de {col}')
+        ax.set_title(f'{col}: Distribution')
         ax.set_xlabel('')
-        ax.tick_params(axis='x', rotation=rotation)
+        ax.tick_params(axis = 'x', rotation = rotation)
 
         if show_values:
             for p in ax.patches:
@@ -36,8 +69,9 @@ def plot_categorical_distribution(df, categorical_columns, relative=False, show_
                 ax.annotate(f'{height:.2f}', (p.get_x() + p.get_width() / 2., height), 
                             ha='center', va='center', xytext=(0, 9), textcoords='offset points')
 
-    for j in range(i + 1, num_filas * 2):
-        axes[j].axis('off')
+    for j in range(i + 1, num_rows * 2):
+        if num_columns > 1:
+            axs[j].axis('off')
 
     plt.tight_layout()
     plt.show()
@@ -165,31 +199,66 @@ def plot_categorical_numerical_relationship(df, categorical_col, numerical_col, 
         plt.show()
 
 
-def plot_histogram_KDE_boxPlot(df, columns, whisker_width=1.5, bins = None):
-    num_cols = len(columns)
-    if num_cols:
-        
-        fig, axes = plt.subplots(num_cols, 2, figsize=(12, 5 * num_cols))
-        print(axes.shape)
+def plot_multiple_histograms_KDEs_boxplots(df, 
+                                           columns, 
+                                           *, 
+                                           kde=True, 
+                                           boxplot = True,
+                                           whisker_width = 1.5,
+                                           bins = None):
+    '''
+    Plot histogram, KDE and Box-Plots in one figure, using `plt.subplots()` and `"Seaborn"`
+    
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        `pandas.DataFrame` to evaluate.
+    
+    columns : list
+        Numerical columns from `df`
+
+    kde : bool, optional
+        If True, plot the KDE. Default is True.
+
+    boxplot : bool, optional
+        If True, plot the boxplot. Default is True.
+                
+    whisker_width : float, optional
+        Width of the whiskers. Default is 1.5.
+    
+    bins : None or str, number, vector, or a pair of such values, optional
+        Number of bins for the groups. Default is "auto".
+    '''
+    num_columns = len(columns)
+    if num_columns:
+        if boxplot:
+            fig, axs = plt.subplots(num_columns, 2, figsize=(12, 5 * num_columns))
+        else:
+            fig, axs = plt.subplots(num_columns, 1, figsize=(6, 5 * num_columns))
 
         for i, column in enumerate(columns):
             if df[column].dtype in ['int64', 'float64']:
-                # Histograma y KDE
-                sns.histplot(df[column], kde=True, ax=axes[i,0] if num_cols > 1 else axes[0], bins= "auto" if not bins else bins)
-                if num_cols > 1:
-                    axes[i,0].set_title(f'Histograma y KDE de {column}')
+                # Histogram and KDE
+                sns.histplot(df[column], kde=kde, ax=axs[i, 0] if boxplot and num_columns > 1 else axs[i], bins="auto" if not bins else bins[i])
+                if boxplot:
+                    if kde:
+                        axs[i, 0].set_title(f'{column}: Histogram and KDE')
+                    else:
+                        axs[i, 0].set_title(f'{column}: Histogram')
                 else:
-                    axes[0].set_title(f'Histograma y KDE de {column}')
+                    if kde:
+                        axs[i].set_title(f'{column}: Histogram and KDE')
+                    else:
+                        axs[i].set_title(f'{column}: Histogram')
 
                 # Boxplot
-                sns.boxplot(x=df[column], ax=axes[i,1] if num_cols > 1 else axes[1], whis=whisker_width)
-                if num_cols > 1:
-                    axes[i,1].set_title(f'Boxplot de {column}')
-                else:
-                    axes[1].set_title(f'Boxplot de {column}')
+                if boxplot:
+                    sns.boxplot(x=df[column], ax=axs[i, 1] if num_columns > 1 else axs[i + num_columns], whis=whisker_width)
+                    axs[i, 1].set_title(f'{column}: BoxPlot')
 
         plt.tight_layout()
         plt.show()
+
 
 def plot_grouped_boxPlots(df, cat_col, num_col, group_size = 5):
     unique_cats = df[cat_col].unique()
@@ -205,7 +274,6 @@ def plot_grouped_boxPlots(df, cat_col, num_col, group_size = 5):
         plt.title(f'Boxplots of {num_col} for {cat_col} (Group {i//group_size + 1})')
         plt.xticks(rotation=45)
         plt.show()
-
 
 
 def plot_grouped_histograms(df, cat_col, num_col, group_size):
@@ -225,7 +293,6 @@ def plot_grouped_histograms(df, cat_col, num_col, group_size):
         plt.ylabel('Frequency')
         plt.legend()
         plt.show()
-
 
 
 def plot_dispersion_with_correlation(df, columna_x, columna_y, tamano_puntos=50, mostrar_correlacion=True):
@@ -348,8 +415,190 @@ def scatter_plots_merged(df, col_categoria, col_num1, col_num2):
     plt.legend(title=col_categoria)
     plt.show()
 
-# Uso de la función
-# df es tu DataFrame
-# scatter_plots_agrupados(df, 'nombre_columna_categoria', 'nombre_columna_num1', 'nombre_columna_num2')
+    # Uso de la función
+    # df es tu DataFrame
+    # scatter_plots_agrupados(df, 'nombre_columna_categoria', 'nombre_columna_num1', 'nombre_columna_num2')
+    return
 
 
+def plot_multiple_lineplots(df, 
+                            numerical_serie_columns, 
+                            *,
+                            all_together = False, 
+                            start_date = None, 
+                            end_date = None
+                            ) -> None:
+    '''
+    Lineplots of serie-style columns in the DataFrame.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        pandas.DataFrame
+
+    numerical_serie_columns : list
+        These columns must be sorted and represent a serie (of dates for example)
+    
+    all_together : bool, optional
+        If True, plot all lines in one plot with a legend. Default is False.
+
+    start_date : str or pd.Timestamp, optional
+        Start date for the plot. Default is None (use all data).
+
+    end_date : str or pd.Timestamp, optional
+        End date for the plot. Default is None (use all data).
+    '''
+    # Redefine dataframe
+    if start_date:
+        df = df[df.index >= pd.to_datetime(start_date)]
+    if end_date:
+        df = df[df.index <= pd.to_datetime(end_date)]
+
+    num_columns = len(numerical_serie_columns)
+    num_rows = (num_columns // 2) + (num_columns % 2)
+
+    if all_together:
+        fig, ax = plt.subplots(1, 1, figsize=(7, 5))
+        for col in numerical_serie_columns:
+            sns.lineplot(x = df.index, y = df[col], data = df, ax = ax, label = col)
+        ax.set_title('All Columns: Line-Plot')
+        ax.set_xlabel(f'{df.index.name}')
+        ax.set_ylabel('Values')
+        ax.legend()
+    else:
+        if num_columns == 1:
+            fig, ax = plt.subplots(1, 1, figsize=(7, 5))
+            sns.lineplot(x = df.index, y = df[numerical_serie_columns[0]], data = df, ax = ax)
+            ax.set_title(f'{numerical_serie_columns[0]}: Line-Plot')
+            ax.set_xlabel(f'{df.index.name}')
+            ax.set_ylabel(f'{numerical_serie_columns[0]}')
+        else:
+            fig, axs = plt.subplots(num_rows, 2, figsize=(15, 5 * num_rows))
+            axs = axs.flatten()  # Return a copy of the array collapsed into one dimension.
+
+            for i, col in enumerate(numerical_serie_columns):
+                ax = axs[i]
+                sns.lineplot(x = df.index, y = df[col], data = df, ax = ax)
+                ax.set_title(f'{col}: Line-Plot')
+                ax.set_xlabel(f'{df.index.name}')
+                ax.set_ylabel(f'{col}')
+
+            for j in range(i + 1, num_rows * 2):
+                axs[j].axis('off')
+
+    plt.tight_layout()
+    plt.show()
+
+
+
+'''
+
+###################################################################################################
+
+#   WARNING     WARNING     WARNING     WARNING     WARNING     WARNING     WARNING     WARNING   #
+
+###################################################################################################
+
+#   DEPRECATED FUNCTIONS                DEPRECATED FUNCTIONS                DEPRECATED FUNCTIONS  #
+
+###################################################################################################
+
+'''
+
+def plot_categorical_distribution(df, categorical_columns, relative = False, show_values = True, rotation = 45):
+    '''
+    Dibuja una matriz de gráficas de 2 columnas y tantas filas como necesite 
+    para pintar el diagrama de barras de las frecuencias absolutas o relativas 
+    pasadas como argumento.
+    
+    Parameters
+    ----------
+    df : pandas.DataFrame
+
+    categorical_columns : list
+        Columnas categóricas    
+
+    relative : bool
+        If True, calcula la frecuencia relativa
+        
+    rotation : int
+        Ángulo de giro de las etiquetas del eje x
+    '''
+    num_columnas = len(categorical_columns)
+    num_filas = (num_columnas // 2) + (num_columnas % 2)
+
+    if num_columnas == 1:
+        fig, axs = plt.subplots(1, 1, figsize=(15, 5))
+    else:
+        fig, axs = plt.subplots(num_filas, 2, figsize=(15, 5 * num_filas))
+    axs = axs.flatten()     # Return a copy of the array collapsed into one dimension.
+
+    for i, col in enumerate(categorical_columns):
+        ax = axs[i]
+        if relative:    
+            total = df[col].value_counts().sum()
+            serie = df[col].value_counts().apply(lambda x: x / total)
+            sns.barplot(x = serie.index, y = serie, ax = ax, palette = 'viridis', hue = serie.index, legend = False)
+            ax.set_ylabel('Frecuencia Relativa')
+        else:
+            serie = df[col].value_counts()
+            sns.barplot( x = serie.index, y = serie, ax = ax, palette = 'viridis', hue = serie.index, legend = False)
+            ax.set_ylabel('Frecuencia')
+
+        ax.set_title(f'Distribución de {col}')
+        ax.set_xlabel('')
+        ax.tick_params(axis = 'x', rotation = rotation)
+
+        if show_values:
+            for p in ax.patches:
+                height = p.get_height()
+                ax.annotate(f'{height:.2f}', (p.get_x() + p.get_width() / 2., height), 
+                            ha='center', va='center', xytext=(0, 9), textcoords='offset points')
+
+    for j in range(i + 1, num_filas * 2):
+        axs[j].axis('off')
+
+    plt.tight_layout()
+    plt.show()
+    
+  
+# def plot_histogram_KDE_boxPlot(df, columns, whisker_width=1.5, bins = None):
+#     num_cols = len(columns)
+#     if num_cols:
+        
+#         fig, axes = plt.subplots(num_cols, 2, figsize=(12, 5 * num_cols))
+#         print(axes.shape)
+
+#         for i, column in enumerate(columns):
+#             if df[column].dtype in ['int64', 'float64']:
+#                 # Histograma y KDE
+#                 sns.histplot(df[column], kde=True, ax=axes[i,0] if num_cols > 1 else axes[0], bins= "auto" if not bins else bins)
+#                 if num_cols > 1:
+#                     axes[i,0].set_title(f'Histograma y KDE de {column}')
+#                 else:
+#                     axes[0].set_title(f'Histograma y KDE de {column}')
+
+#                 # Boxplot
+#                 sns.boxplot(x=df[column], ax=axes[i,1] if num_cols > 1 else axes[1], whis=whisker_width)
+#                 if num_cols > 1:
+#                     axes[i,1].set_title(f'Boxplot de {column}')
+#                 else:
+#                     axes[1].set_title(f'Boxplot de {column}')
+
+#         plt.tight_layout()
+#         plt.show()
+
+    
+'''
+
+###################################################################################################
+
+#   WARNING     WARNING     WARNING     WARNING     WARNING     WARNING     WARNING     WARNING   #
+
+###################################################################################################
+
+#   DEPRECATED FUNCTIONS                DEPRECATED FUNCTIONS                DEPRECATED FUNCTIONS  #
+
+###################################################################################################
+
+'''
