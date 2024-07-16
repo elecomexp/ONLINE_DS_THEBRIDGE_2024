@@ -1,3 +1,5 @@
+import re
+
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
@@ -32,6 +34,14 @@ def coeficiente_variación(df):
     return df_var
 
 
+
+def split_by_uppercase(text) -> str:
+    '''
+    Utiliza expresiones regulares para encontrar las mayúsculas, separa una cadena,
+    y retornar una nueva string separada por espacios
+    '''
+    strings = re.findall(r'[A-Z][^A-Z]*', text)
+    return ' '.join(strings)
 
 
 scipy.stats.mannwhitneyu()
