@@ -1,6 +1,29 @@
 '''
 Author: Lander Combarro Exposito
 Date: 2024-07-17
+
+Module Functions:
+
+plot_multiple_categorical_distributions
+plot_multiple_histograms_KDEs_boxplots
+mostrar_diagramas_violin
+plot_multiple_boxplots
+plot_multiple_lineplots
+
+plot_categorical_relationship_fin
+plot_absolute_categorical_relationship_and_contingency_table
+
+plot_categorical_numerical_relationship
+plot_grouped_boxPlots
+plot_histograms_by_categorical_numerical_relationship
+plot_grouped_histograms
+
+plot_dispersion_with_correlation
+
+plot_bubblePlot
+scatter_plots_merged
+plot_scatter
+
 '''
 
 import matplotlib.pyplot as plt
@@ -579,6 +602,15 @@ def plot_dispersion_with_correlation(df, columna_x, columna_y, tamano_puntos=50,
     plt.show()
 
 
+
+'''
+###################################################################################################
+#                                                                                                 #
+#    Análisis MULTIVARIANTE           Análisis MULTIVARIANTE            Análisis MULTIVARIANTE    #
+#                                                                                                 #
+###################################################################################################
+'''
+
 def plot_bubblePlot(df, col_x, col_y, col_size, scale = 1000):
     """
     Crea un scatter plot usando dos columnas para los ejes X e Y,
@@ -634,61 +666,75 @@ def scatter_plots_merged(df, col_categoria, col_num1, col_num2):
     # scatter_plots_agrupados(df, 'nombre_columna_categoria', 'nombre_columna_num1', 'nombre_columna_num2')
     return
 
-'''
-###################################################################################################
-#                                                                                                 #
-#    Análisis MULTIVARIANTE           Análisis MULTIVARIANTE            Análisis MULTIVARIANTE    #
-#                                                                                                 #
-###################################################################################################
-'''
 
-def plot_scatter_by_category(df, num_column1, num_column2, cat_column=None, point_size=50):
-    '''
-    Generate a scatter plot of num_column1 vs num_column2 with optional color coding by a categorical column.
-    
+def plot_scatter(df, num_col1, num_col2, cat_col=None, point_size=50, scale=1, show_legend=True):
+    """
+    Plots a scatter diagram from `df` of `num_col1` vs `num_col2` using `cat_col` for coloring
+    the points, and `point_size * scale` for determining the size of the points. If no `cat_col` is 
+    provided, no color parameter is passed to the plotting function.
+    `show_legend` doesn't work yet
+
     Parameters:
-    -----------
+    ----------
     df : pd.DataFrame
-        The input DataFrame containing the data.
+        DataFrame containing the data.
         
-    num_column1 : str
-        The name of the first numerical column for the x-axis.
+    num_col1 : str
+        Name of the numerical column for the X-axis.
+        
+    num_col2 : str
+        Name of the numerical column for the Y-axis.
     
-    num_column2 : str
-        The name of the second numerical column for the y-axis.
+    cat_col : str, optional
+        Name of the categorical column for coloring the points. Defaults to None.
     
-    cat_column : str or None, optional (default=None)
-        The name of the categorical column for color coding. If None, points will not be colored based on category.
+    point_size : str or float
+        Value or column name for the size of the points. Can be a numerical value or a string representing a column name. Default is 50.
     
-    point_size : int, optional (default=50)
-        The size of the points in the scatter plot.
+    scale : float
+        Scale factor for the point sizes if `point_size` is a column name. Default is 1.
     
-    Returns:
-    --------
-    None (displays plot)
-    
+    show_legend : bool
+        Whether to show the legend for colors and sizes. Default is True.
+
     Example:
     --------
-    df = pd.DataFrame({
-        'X': [1, 2, 3, 4, 5],
-        'Y': [5, 4, 3, 2, 1],
-        'Category': ['A', 'B', 'A', 'B', 'A']
-    })
-    
-    scatterplot_with_category(df, 'X', 'Y', 'Category', point_size=100)
-    '''
+        # Assume df is a DataFrame with appropriate columns
+        df['log_population'] = np.log10(df['population_total'])
+        plot_scatter(
+            df=df,
+            num_col1='longitude',
+            num_col2='latitude',
+            cat_col='log_population',
+            point_size='population_total',
+            scale=1/10000,
+            show_legend=True
+        )
+    """
     plt.figure(figsize=(10, 6))
     
-    if cat_column:
-        sns.scatterplot(data=df, x=num_column1, y=num_column2, hue=cat_column, s=point_size)
+    # Determine point sizes
+    if isinstance(point_size, str):
+        sizes = df[point_size] * scale
     else:
-        sns.scatterplot(data=df, x=num_column1, y=num_column2, s=point_size)
+        sizes = point_size
     
-    plt.title(f'Scatter plot of {num_column1} vs {num_column2}')
-    plt.xlabel(num_column1)
-    plt.ylabel(num_column2)
-    plt.legend(title=cat_column)
-    plt.grid(True)
+    # Plot the scatter diagram
+    if cat_col:
+        scatter = sns.scatterplot(data = df, x = num_col1, y = num_col2,
+                                  hue = cat_col, size = sizes, sizes = (20, 200), 
+                                  palette = 'viridis', alpha = 0.6, legend = show_legend)
+    else:
+        scatter = sns.scatterplot(data=df, x=num_col1, y=num_col2, size=sizes, sizes=(20, 200), palette='viridis', alpha=0.6, legend=show_legend)
+    
+    if show_legend:
+        plt.legend()
+    else:
+        plt.colorbar(scatter, ax=plt.gca(), label=cat_col if cat_col else '')
+    
+    plt.xlabel(num_col1)
+    plt.ylabel(num_col2)
+    plt.title(f'Scatter Plot of {num_col1} vs {num_col2}')
     plt.show()
 
 
