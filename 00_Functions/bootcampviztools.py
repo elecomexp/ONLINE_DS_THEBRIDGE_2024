@@ -1,16 +1,23 @@
+'''
+Author: Lander Combarro Exposito
+Date: 2024-07-17
+'''
+
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 import numpy as np
 
-def plot_multiple_categorical_distributions(df,
-                                            categorical_columns,
-                                            *, 
-                                            relative = False, 
-                                            show_values = True, 
-                                            rotation = 45, 
-                                            palette = 'viridis'
-                                            ) -> None:
+'''
+###################################################################################################
+#                                                                                                 #
+#   Análisis UNIVARIANTE               Análisis UNIVARIANTE                Análisis UNIVARIANTE   #
+#                                                                                                 #
+###################################################################################################
+'''
+
+
+def plot_multiple_categorical_distributions(df, categorical_columns, *, relative = False, show_values = True, rotation = 45, palette = 'viridis') -> None:
     '''
     Plot a bar-graphs matrix, with 2 columns and the rows needed to plot the
     `absolute` or `relative` frequency from the categorical columns of `df`.
@@ -75,6 +82,177 @@ def plot_multiple_categorical_distributions(df,
 
     plt.tight_layout()
     plt.show()
+
+
+def plot_multiple_histograms_KDEs_boxplots(df, columns, *, kde=True, boxplot = True, whisker_width = 1.5, bins = None) -> None:
+    '''
+    Plot histogram, KDE and Box-Plots in one figure, using `plt.subplots()` and `"Seaborn"`
+    
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        `pandas.DataFrame` to evaluate.
+    
+    columns : list
+        Numerical columns from `df`
+
+    kde : bool, optional
+        If True, plot the KDE. Default is True.
+
+    boxplot : bool, optional
+        If True, plot the boxplot. Default is True.
+                
+    whisker_width : float, optional
+        Width of the whiskers. Default is 1.5.
+    
+    bins : None or str, number, vector, or a pair of such values, optional
+        Number of bins for the groups. Default is "auto".
+    '''
+    num_columns = len(columns)
+    if num_columns:
+        if boxplot:
+            fig, axs = plt.subplots(num_columns, 2, figsize=(12, 5 * num_columns))
+        else:
+            fig, axs = plt.subplots(num_columns, 1, figsize=(6, 5 * num_columns))
+
+        for i, column in enumerate(columns):
+            if df[column].dtype in ['int64', 'float64']:
+                # Histogram and KDE
+                sns.histplot(df[column], kde=kde, ax=axs[i, 0] if boxplot and num_columns > 1 else axs[i], bins="auto" if not bins else bins[i])
+                if boxplot:
+                    if kde:
+                        axs[i, 0].set_title(f'{column}: Histogram and KDE')
+                    else:
+                        axs[i, 0].set_title(f'{column}: Histogram')
+                else:
+                    if kde:
+                        axs[i].set_title(f'{column}: Histogram and KDE')
+                    else:
+                        axs[i].set_title(f'{column}: Histogram')
+
+                # Boxplot
+                if boxplot:
+                    sns.boxplot(x=df[column], ax=axs[i, 1] if num_columns > 1 else axs[i + num_columns], whis=whisker_width)
+                    axs[i, 1].set_title(f'{column}: BoxPlot')
+
+        plt.tight_layout()
+        plt.show()
+
+
+def mostrar_diagramas_violin(df, columnas_numericas):
+    """
+    Muestra una matriz de diagramas de violín para las columnas numéricas especificadas de un DataFrame.
+
+    Args:
+    df (pd.DataFrame): DataFrame que contiene los datos.
+    columnas_numericas (list): Lista de nombres de las columnas numéricas.
+    """
+    num_cols = len(columnas_numericas)
+
+    # Configurar el tamaño de la figura
+    plt.figure(figsize=(num_cols * 4, 4))
+
+    # Crear un diagrama de violín para cada columna numérica
+    for i, col in enumerate(columnas_numericas, 1):
+        plt.subplot(1, num_cols, i)
+        sns.violinplot(y=df[col])
+        plt.title(col)
+
+    # Mostrar la matriz de diagramas de violín
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_multiple_boxplots(df, columns, dim_matriz_visual = 2):
+    num_cols = len(columns)
+    num_rows = num_cols // dim_matriz_visual + num_cols % dim_matriz_visual
+    fig, axes = plt.subplots(num_rows, dim_matriz_visual, figsize=(12, 6 * num_rows))
+    axes = axes.flatten()
+
+    for i, column in enumerate(columns):
+        if df[column].dtype in ['int64', 'float64']:
+            sns.boxplot(data=df, x=column, ax=axes[i])
+            axes[i].set_title(column)
+
+    # Ocultar ejes vacíos
+    for j in range(i+1, num_rows * 2):
+        axes[j].axis('off')
+
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_multiple_lineplots(df, numerical_serie_columns, *, all_together = False, start_date = None, end_date = None
+                            ) -> None:
+    '''
+    Lineplots of serie-style columns in the DataFrame.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        pandas.DataFrame
+
+    numerical_serie_columns : list
+        These columns must be sorted and represent a serie (of dates for example)
+    
+    all_together : bool, optional
+        If True, plot all lines in one plot with a legend. Default is False.
+
+    start_date : str or pd.Timestamp, optional
+        Start date for the plot. Default is None (use all data).
+
+    end_date : str or pd.Timestamp, optional
+        End date for the plot. Default is None (use all data).
+    '''
+    # Redefine dataframe
+    if start_date:
+        df = df[df.index >= pd.to_datetime(start_date)]
+    if end_date:
+        df = df[df.index <= pd.to_datetime(end_date)]
+
+    num_columns = len(numerical_serie_columns)
+    num_rows = (num_columns // 2) + (num_columns % 2)
+
+    if all_together:
+        fig, ax = plt.subplots(1, 1, figsize=(7, 5))
+        for col in numerical_serie_columns:
+            sns.lineplot(x = df.index, y = df[col], data = df, ax = ax, label = col)
+        ax.set_title('All Columns: Line-Plot')
+        ax.set_xlabel(f'{df.index.name}')
+        ax.set_ylabel('Values')
+        ax.legend()
+    else:
+        if num_columns == 1:
+            fig, ax = plt.subplots(1, 1, figsize=(7, 5))
+            sns.lineplot(x = df.index, y = df[numerical_serie_columns[0]], data = df, ax = ax)
+            ax.set_title(f'{numerical_serie_columns[0]}: Line-Plot')
+            ax.set_xlabel(f'{df.index.name}')
+            ax.set_ylabel(f'{numerical_serie_columns[0]}')
+        else:
+            fig, axs = plt.subplots(num_rows, 2, figsize=(15, 5 * num_rows))
+            axs = axs.flatten()  # Return a copy of the array collapsed into one dimension.
+
+            for i, col in enumerate(numerical_serie_columns):
+                ax = axs[i]
+                sns.lineplot(x = df.index, y = df[col], data = df, ax = ax)
+                ax.set_title(f'{col}: Line-Plot')
+                ax.set_xlabel(f'{df.index.name}')
+                ax.set_ylabel(f'{col}')
+
+            for j in range(i + 1, num_rows * 2):
+                axs[j].axis('off')
+
+    plt.tight_layout()
+    plt.show()
+
+
+'''
+###################################################################################################
+#                                                                                                 #
+#   Análisis MULTIVARIANTE            Análisis MULTIVARIANTE             Análisis MULTIVARIANTE   #
+#                                                                                                 #
+###################################################################################################
+'''
 
 
 def plot_categorical_relationship_fin(df, cat_col1, cat_col2, relative_freq=False, show_values=True, size_group = 5):
@@ -199,67 +377,6 @@ def plot_categorical_numerical_relationship(df, categorical_col, numerical_col, 
         plt.show()
 
 
-def plot_multiple_histograms_KDEs_boxplots(df, 
-                                           columns, 
-                                           *, 
-                                           kde=True, 
-                                           boxplot = True,
-                                           whisker_width = 1.5,
-                                           bins = None):
-    '''
-    Plot histogram, KDE and Box-Plots in one figure, using `plt.subplots()` and `"Seaborn"`
-    
-    Parameters
-    ----------
-    df : pandas.DataFrame
-        `pandas.DataFrame` to evaluate.
-    
-    columns : list
-        Numerical columns from `df`
-
-    kde : bool, optional
-        If True, plot the KDE. Default is True.
-
-    boxplot : bool, optional
-        If True, plot the boxplot. Default is True.
-                
-    whisker_width : float, optional
-        Width of the whiskers. Default is 1.5.
-    
-    bins : None or str, number, vector, or a pair of such values, optional
-        Number of bins for the groups. Default is "auto".
-    '''
-    num_columns = len(columns)
-    if num_columns:
-        if boxplot:
-            fig, axs = plt.subplots(num_columns, 2, figsize=(12, 5 * num_columns))
-        else:
-            fig, axs = plt.subplots(num_columns, 1, figsize=(6, 5 * num_columns))
-
-        for i, column in enumerate(columns):
-            if df[column].dtype in ['int64', 'float64']:
-                # Histogram and KDE
-                sns.histplot(df[column], kde=kde, ax=axs[i, 0] if boxplot and num_columns > 1 else axs[i], bins="auto" if not bins else bins[i])
-                if boxplot:
-                    if kde:
-                        axs[i, 0].set_title(f'{column}: Histogram and KDE')
-                    else:
-                        axs[i, 0].set_title(f'{column}: Histogram')
-                else:
-                    if kde:
-                        axs[i].set_title(f'{column}: Histogram and KDE')
-                    else:
-                        axs[i].set_title(f'{column}: Histogram')
-
-                # Boxplot
-                if boxplot:
-                    sns.boxplot(x=df[column], ax=axs[i, 1] if num_columns > 1 else axs[i + num_columns], whis=whisker_width)
-                    axs[i, 1].set_title(f'{column}: BoxPlot')
-
-        plt.tight_layout()
-        plt.show()
-
-
 def plot_grouped_boxPlots(df, cat_col, num_col, group_size = 5):
     unique_cats = df[cat_col].unique()
     num_cats = len(unique_cats)
@@ -344,48 +461,6 @@ def plot_bubblePlot(df, col_x, col_y, col_size, scale = 1000):
     plt.show()
 
 
-def mostrar_diagramas_violin(df, columnas_numericas):
-    """
-    Muestra una matriz de diagramas de violín para las columnas numéricas especificadas de un DataFrame.
-
-    Args:
-    df (pd.DataFrame): DataFrame que contiene los datos.
-    columnas_numericas (list): Lista de nombres de las columnas numéricas.
-    """
-    num_cols = len(columnas_numericas)
-
-    # Configurar el tamaño de la figura
-    plt.figure(figsize=(num_cols * 4, 4))
-
-    # Crear un diagrama de violín para cada columna numérica
-    for i, col in enumerate(columnas_numericas, 1):
-        plt.subplot(1, num_cols, i)
-        sns.violinplot(y=df[col])
-        plt.title(col)
-
-    # Mostrar la matriz de diagramas de violín
-    plt.tight_layout()
-    plt.show()
-
-
-def plot_multiple_boxplots(df, columns, dim_matriz_visual = 2):
-    num_cols = len(columns)
-    num_rows = num_cols // dim_matriz_visual + num_cols % dim_matriz_visual
-    fig, axes = plt.subplots(num_rows, dim_matriz_visual, figsize=(12, 6 * num_rows))
-    axes = axes.flatten()
-
-    for i, column in enumerate(columns):
-        if df[column].dtype in ['int64', 'float64']:
-            sns.boxplot(data=df, x=column, ax=axes[i])
-            axes[i].set_title(column)
-
-    # Ocultar ejes vacíos
-    for j in range(i+1, num_rows * 2):
-        axes[j].axis('off')
-
-    plt.tight_layout()
-    plt.show()
-
 
 def scatter_plots_merged(df, col_categoria, col_num1, col_num2):
     """
@@ -421,88 +496,18 @@ def scatter_plots_merged(df, col_categoria, col_num1, col_num2):
     return
 
 
-def plot_multiple_lineplots(df, 
-                            numerical_serie_columns, 
-                            *,
-                            all_together = False, 
-                            start_date = None, 
-                            end_date = None
-                            ) -> None:
-    '''
-    Lineplots of serie-style columns in the DataFrame.
-
-    Parameters
-    ----------
-    df : pandas.DataFrame
-        pandas.DataFrame
-
-    numerical_serie_columns : list
-        These columns must be sorted and represent a serie (of dates for example)
-    
-    all_together : bool, optional
-        If True, plot all lines in one plot with a legend. Default is False.
-
-    start_date : str or pd.Timestamp, optional
-        Start date for the plot. Default is None (use all data).
-
-    end_date : str or pd.Timestamp, optional
-        End date for the plot. Default is None (use all data).
-    '''
-    # Redefine dataframe
-    if start_date:
-        df = df[df.index >= pd.to_datetime(start_date)]
-    if end_date:
-        df = df[df.index <= pd.to_datetime(end_date)]
-
-    num_columns = len(numerical_serie_columns)
-    num_rows = (num_columns // 2) + (num_columns % 2)
-
-    if all_together:
-        fig, ax = plt.subplots(1, 1, figsize=(7, 5))
-        for col in numerical_serie_columns:
-            sns.lineplot(x = df.index, y = df[col], data = df, ax = ax, label = col)
-        ax.set_title('All Columns: Line-Plot')
-        ax.set_xlabel(f'{df.index.name}')
-        ax.set_ylabel('Values')
-        ax.legend()
-    else:
-        if num_columns == 1:
-            fig, ax = plt.subplots(1, 1, figsize=(7, 5))
-            sns.lineplot(x = df.index, y = df[numerical_serie_columns[0]], data = df, ax = ax)
-            ax.set_title(f'{numerical_serie_columns[0]}: Line-Plot')
-            ax.set_xlabel(f'{df.index.name}')
-            ax.set_ylabel(f'{numerical_serie_columns[0]}')
-        else:
-            fig, axs = plt.subplots(num_rows, 2, figsize=(15, 5 * num_rows))
-            axs = axs.flatten()  # Return a copy of the array collapsed into one dimension.
-
-            for i, col in enumerate(numerical_serie_columns):
-                ax = axs[i]
-                sns.lineplot(x = df.index, y = df[col], data = df, ax = ax)
-                ax.set_title(f'{col}: Line-Plot')
-                ax.set_xlabel(f'{df.index.name}')
-                ax.set_ylabel(f'{col}')
-
-            for j in range(i + 1, num_rows * 2):
-                axs[j].axis('off')
-
-    plt.tight_layout()
-    plt.show()
-
 
 
 '''
-
 ###################################################################################################
-
+#                                                                                                 #
 #   WARNING     WARNING     WARNING     WARNING     WARNING     WARNING     WARNING     WARNING   #
-
+#                                                                                                 #
 ###################################################################################################
-
+#                                                                                                 #
 #   DEPRECATED FUNCTIONS                DEPRECATED FUNCTIONS                DEPRECATED FUNCTIONS  #
-
+#                                                                                                 #
 ###################################################################################################
-
 '''
 
 def plot_categorical_distribution(df, categorical_columns, relative = False, show_values = True, rotation = 45):
@@ -562,43 +567,28 @@ def plot_categorical_distribution(df, categorical_columns, relative = False, sho
     plt.show()
     
   
-# def plot_histogram_KDE_boxPlot(df, columns, whisker_width=1.5, bins = None):
-#     num_cols = len(columns)
-#     if num_cols:
+def OLD_plot_histogram_KDE_boxPlot(df, columns, whisker_width=1.5, bins = None):
+    num_cols = len(columns)
+    if num_cols:
         
-#         fig, axes = plt.subplots(num_cols, 2, figsize=(12, 5 * num_cols))
-#         print(axes.shape)
+        fig, axes = plt.subplots(num_cols, 2, figsize=(12, 5 * num_cols))
+        print(axes.shape)
 
-#         for i, column in enumerate(columns):
-#             if df[column].dtype in ['int64', 'float64']:
-#                 # Histograma y KDE
-#                 sns.histplot(df[column], kde=True, ax=axes[i,0] if num_cols > 1 else axes[0], bins= "auto" if not bins else bins)
-#                 if num_cols > 1:
-#                     axes[i,0].set_title(f'Histograma y KDE de {column}')
-#                 else:
-#                     axes[0].set_title(f'Histograma y KDE de {column}')
+        for i, column in enumerate(columns):
+            if df[column].dtype in ['int64', 'float64']:
+                # Histograma y KDE
+                sns.histplot(df[column], kde=True, ax=axes[i,0] if num_cols > 1 else axes[0], bins= "auto" if not bins else bins)
+                if num_cols > 1:
+                    axes[i,0].set_title(f'Histograma y KDE de {column}')
+                else:
+                    axes[0].set_title(f'Histograma y KDE de {column}')
 
-#                 # Boxplot
-#                 sns.boxplot(x=df[column], ax=axes[i,1] if num_cols > 1 else axes[1], whis=whisker_width)
-#                 if num_cols > 1:
-#                     axes[i,1].set_title(f'Boxplot de {column}')
-#                 else:
-#                     axes[1].set_title(f'Boxplot de {column}')
+                # Boxplot
+                sns.boxplot(x=df[column], ax=axes[i,1] if num_cols > 1 else axes[1], whis=whisker_width)
+                if num_cols > 1:
+                    axes[i,1].set_title(f'Boxplot de {column}')
+                else:
+                    axes[1].set_title(f'Boxplot de {column}')
 
-#         plt.tight_layout()
-#         plt.show()
-
-    
-'''
-
-###################################################################################################
-
-#   WARNING     WARNING     WARNING     WARNING     WARNING     WARNING     WARNING     WARNING   #
-
-###################################################################################################
-
-#   DEPRECATED FUNCTIONS                DEPRECATED FUNCTIONS                DEPRECATED FUNCTIONS  #
-
-###################################################################################################
-
-'''
+        plt.tight_layout()
+        plt.show()
