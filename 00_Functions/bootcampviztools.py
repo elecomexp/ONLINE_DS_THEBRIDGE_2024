@@ -257,7 +257,7 @@ def plot_multiple_lineplots(df, numerical_serie_columns, *, all_together = False
 
 '''
 ##############################################
-#          Dos variable CATEGÓRICAS          #
+#          Dos variables CATEGÓRICAS         #
 ##############################################
 '''
 
@@ -319,6 +319,62 @@ def plot_categorical_relationship_fin(df, cat_col1, cat_col2, relative_freq=Fals
 
         # Muestra el gráfico
         plt.show()
+
+
+def plot_absolute_categorical_relationship_and_contingency_table(df, col1, col2):
+    '''
+    This function takes a DataFrame and two categorical column names, then performs the following tasks:
+    
+    1. Draws a combination of graphs with the absolute frequencies of each categorical column using countplot.
+    2. Creates a catplot with the second categorical column as the 'col' argument for comparison.
+    3. Returns the contingency table of the two columns.
+    
+    Parameters:
+    -----------
+    df : pd.DataFrame
+        The input DataFrame containing the data.
+        
+    col1 : str
+        The name of the first categorical column.
+    
+    col2 : str
+        The name of the second categorical column.
+    
+    Returns:
+    --------
+    pd.DataFrame: A contingency table showing the frequency distribution of the two categorical columns.
+    
+    Example:
+    --------
+    df = pd.DataFrame({
+        'Category1': ['A', 'B', 'A', 'C', 'B', 'A', 'C'],
+        'Category2': ['X', 'Y', 'X', 'Y', 'X', 'X', 'Y']
+    })
+    
+    result = plot_and_contingency_table(df, 'Category1', 'Category2')
+    print(result)
+    '''
+    fig, axs = plt.subplots(1, 2, figsize = (15, 5))
+    
+    # Countplot for the first categorical column
+    sns.countplot(data = df, x = col1, ax = axs[0])
+    axs[0].set_title(f'Count of {col1}')
+    
+    # Countplot for the second categorical column
+    sns.countplot(data=df, x=col2, ax=axs[1])
+    axs[1].set_title(f'Count of {col2}')
+    
+    plt.tight_layout()
+    
+    # Create a catplot for the comparison of the two columns
+    catplot_fig = sns.catplot(data = df, x = col1, col = col2, kind = 'count')
+    
+    plt.show()
+    
+    # Generate the contingency table
+    contingency_table = pd.crosstab(df[col1], df[col2])
+    
+    return contingency_table
 
 
 '''
@@ -405,6 +461,71 @@ def plot_grouped_boxPlots(df, cat_col, num_col, group_size = 5):
         plt.show()
 
 
+def plot_histograms_by_categorical_numerical_relationship(df, cat_column, num_column):
+    '''
+    Generate a grid of histograms to compare a categorical variable with a numerical variable.
+    
+    Parameters:
+    -----------
+    df : pd.DataFrame
+        The input DataFrame containing the data.
+        
+    cat_column : str
+        The name of the categorical column in the DataFrame.
+    
+    num_column : str
+        The name of the numerical column in the DataFrame.
+    
+    Returns:
+    --------
+    None (displays plots)
+    
+    Example:
+    --------
+    df = pd.DataFrame({
+        'Category': ['A', 'B', 'A', 'C', 'B', 'A', 'C'],
+        'Numeric': [10, 15, 8, 12, 9, 11, 13]
+    })
+    
+    plot_categorical_numerical_relationship(df, 'Category', 'Numeric')
+    '''
+    # Get unique categories in the categorical column
+    categories = df[cat_column].unique()
+    num_categories = len(categories)
+    
+    # Calculate number of rows and columns for subplot grid
+    num_rows = (num_categories + 2) // 3  # Ensure at least one row
+    num_cols = min(num_categories, 3)
+    
+    # Create a grid of subplots
+    fig, axs = plt.subplots(num_rows, num_cols, figsize=(15, 4 * num_rows))
+    
+    # Flatten the axis array if there's only one row or one column
+    if num_rows == 1 and num_cols == 1:
+        axs = np.array([axs])
+    elif num_rows == 1:
+        axs = axs.reshape(1, -1)
+    elif num_cols == 1:
+        axs = axs.reshape(-1, 1)
+    
+    # Iterate through each category and plot corresponding histograms
+    for i, category in enumerate(categories):
+        row = i // num_cols
+        col = i % num_cols
+        
+        # Filter DataFrame rows based on category
+        data_subset = df[df[cat_column] == category]
+        
+        # Plot histogram for the numerical column
+        sns.histplot(data=data_subset, x=num_column, ax=axs[row, col])
+        axs[row, col].set_title(f'Histogram of {num_column} for {cat_column} = {category}')
+        axs[row, col].set_xlabel(num_column)
+        axs[row, col].set_ylabel('Frequency')
+    
+    plt.tight_layout()
+    plt.show()
+
+
 def plot_grouped_histograms(df, cat_col, num_col, group_size = 3):
     unique_cats = df[cat_col].unique()
     num_cats = len(unique_cats)
@@ -422,6 +543,13 @@ def plot_grouped_histograms(df, cat_col, num_col, group_size = 3):
         plt.ylabel('Frequency')
         plt.legend()
         plt.show()
+
+
+'''
+##############################################
+#           Dos Variables NUMÉRICAS          #
+##############################################
+'''
 
 
 def plot_dispersion_with_correlation(df, columna_x, columna_y, tamano_puntos=50, mostrar_correlacion=True):
@@ -506,6 +634,62 @@ def scatter_plots_merged(df, col_categoria, col_num1, col_num2):
     # scatter_plots_agrupados(df, 'nombre_columna_categoria', 'nombre_columna_num1', 'nombre_columna_num2')
     return
 
+'''
+###################################################################################################
+#                                                                                                 #
+#    Análisis MULTIVARIANTE           Análisis MULTIVARIANTE            Análisis MULTIVARIANTE    #
+#                                                                                                 #
+###################################################################################################
+'''
+
+def plot_scatter_by_category(df, num_column1, num_column2, cat_column=None, point_size=50):
+    '''
+    Generate a scatter plot of num_column1 vs num_column2 with optional color coding by a categorical column.
+    
+    Parameters:
+    -----------
+    df : pd.DataFrame
+        The input DataFrame containing the data.
+        
+    num_column1 : str
+        The name of the first numerical column for the x-axis.
+    
+    num_column2 : str
+        The name of the second numerical column for the y-axis.
+    
+    cat_column : str or None, optional (default=None)
+        The name of the categorical column for color coding. If None, points will not be colored based on category.
+    
+    point_size : int, optional (default=50)
+        The size of the points in the scatter plot.
+    
+    Returns:
+    --------
+    None (displays plot)
+    
+    Example:
+    --------
+    df = pd.DataFrame({
+        'X': [1, 2, 3, 4, 5],
+        'Y': [5, 4, 3, 2, 1],
+        'Category': ['A', 'B', 'A', 'B', 'A']
+    })
+    
+    scatterplot_with_category(df, 'X', 'Y', 'Category', point_size=100)
+    '''
+    plt.figure(figsize=(10, 6))
+    
+    if cat_column:
+        sns.scatterplot(data=df, x=num_column1, y=num_column2, hue=cat_column, s=point_size)
+    else:
+        sns.scatterplot(data=df, x=num_column1, y=num_column2, s=point_size)
+    
+    plt.title(f'Scatter plot of {num_column1} vs {num_column2}')
+    plt.xlabel(num_column1)
+    plt.ylabel(num_column2)
+    plt.legend(title=cat_column)
+    plt.grid(True)
+    plt.show()
 
 
 
