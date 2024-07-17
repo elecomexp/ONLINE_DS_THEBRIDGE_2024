@@ -1,0 +1,21 @@
+pip install virtualenv --> instalar creador de entornos virtuales
+
+virtualenv entorno_virtual --> crear entorno virtual
+
+rm -r entorno_virtual
+
+(source) entorno_virtual/Scripts/activate --> activar entorno virtual (creo que source es si no estás en el path)
+(source) entorno_virtual/bin/activate --> activar entorno virtual en MAC
+deactivate --> Desactivar el entorno virtual
+
+virtualenv entorno_virtual -p path\to\new_python.exe --> Crear un entorno virtual con una versión especifíca de python
+
+pip install libreria==3.0.2     --> Instala versiones en concreto
+pip install libreria<=3.0.2     --> Instala la primera versión por debajo de
+pip install libreria">=2.1.1,libreria<=3.0.2"   --> Instala la primera versión que cumpla esa condiciónpip 
+
+pip install -r requirements.txt --> instalar todas las librerías del archivo requirements.txt. Si lo haces en el terminal del ordenador, te instala lo que tienes en tu ordenador. Si lo haces desde tu entorno virtual, te instala lo que tienes en el entorno virtual
+
+pip freeze > requirements.txt --> exportar los nombres de las librerías instaladas a un archivo llamado requirements.txt. Si lo haces en el terminal del ordenador, te exporta lo que tienes en tu ordenador. Si lo haces desde tu entorno virtual, te exporta lo que tienes en el entorno virtual.
+
+pip uninstall -r requirements.txt -y --> desinstalar todas las librerías del requirements.txt. Aplicable tanto a tu ordenador como a tu entorno virtual.
