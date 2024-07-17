@@ -250,11 +250,16 @@ def plot_multiple_lineplots(df, numerical_serie_columns, *, all_together = False
 '''
 ###################################################################################################
 #                                                                                                 #
-#   Análisis MULTIVARIANTE            Análisis MULTIVARIANTE             Análisis MULTIVARIANTE   #
+#    Análisis BIVARIANTE                Análisis BIVARIANTE                 Análisis BIVARIANTE   #
 #                                                                                                 #
 ###################################################################################################
 '''
 
+'''
+##############################################
+#          Dos variable CATEGÓRICAS          #
+##############################################
+'''
 
 def plot_categorical_relationship_fin(df, cat_col1, cat_col2, relative_freq=False, show_values=True, size_group = 5):
     # Prepara los datos
@@ -316,7 +321,13 @@ def plot_categorical_relationship_fin(df, cat_col1, cat_col2, relative_freq=Fals
         plt.show()
 
 
-def plot_categorical_numerical_relationship(df, categorical_col, numerical_col, show_values=True, measure='mean'):
+'''
+##############################################
+#    Dos Variables: CATEGÓRICA + NUMÉRICA    #
+##############################################
+'''
+
+def plot_categorical_numerical_relationship(df, categorical_col, numerical_col, show_values = True, measure = 'mean'):
     # Calcula la medida de tendencia central (mean o median)
     if measure == 'median':
         grouped_data = df.groupby(categorical_col)[numerical_col].median()
@@ -394,7 +405,7 @@ def plot_grouped_boxPlots(df, cat_col, num_col, group_size = 5):
         plt.show()
 
 
-def plot_grouped_histograms(df, cat_col, num_col, group_size):
+def plot_grouped_histograms(df, cat_col, num_col, group_size = 3):
     unique_cats = df[cat_col].unique()
     num_cats = len(unique_cats)
 
@@ -460,7 +471,6 @@ def plot_bubblePlot(df, col_x, col_y, col_size, scale = 1000):
     plt.ylabel(col_y)
     plt.title(f'Burbujas de {col_x} vs {col_y} con Tamaño basado en {col_size}')
     plt.show()
-
 
 
 def scatter_plots_merged(df, col_categoria, col_num1, col_num2):
