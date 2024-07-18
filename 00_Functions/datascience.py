@@ -37,8 +37,18 @@ def coeficiente_variación(df):
 
 def split_by_uppercase(text) -> str:
     '''
-    Utiliza expresiones regulares para encontrar las mayúsculas, separa una cadena,
-    y retornar una nueva string separada por espacios
+    Uses regular expressions to find uppercase letters, split a string at those points,
+    and return a new string separated by spaces.
+    
+    Parameters:
+    ----------
+    text : str
+        Text to split.
+        
+    Returns:
+    -------
+    str
+        The modified string with spaces inserted before each uppercase letter.
     '''
     strings = re.findall(r'[A-Z][^A-Z]*', text)
     return ' '.join(strings)
