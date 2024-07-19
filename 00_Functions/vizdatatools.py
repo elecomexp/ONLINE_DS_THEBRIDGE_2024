@@ -4,25 +4,48 @@ Date: 2024-07-17
 
 Module Functions:
 
-plot_multiple_categorical_distributions
-plot_multiple_histograms_KDEs_boxplots
-mostrar_diagramas_violin
-plot_multiple_boxplots
-plot_multiple_lineplots
+Análisis  univariante
+---------------------
 
-plot_categorical_relationship_fin
-plot_absolute_categorical_relationship_and_contingency_table
+    plot_multiple_categorical_distributions
+    plot_multiple_histograms_KDEs_boxplots
+    violinplot_multiple
+    boxplot_multiple
+    lineplot_multiple
 
-plot_categorical_numerical_relationship
-plot_grouped_boxPlots
-plot_histograms_by_categorical_numerical_relationship
-plot_grouped_histograms
+Análisis bivariante
+-------------------
 
-plot_dispersion_with_correlation
+    Categórica - Categórica
+    
+        plot_categorical_relationship
+        plot_absolute_categorical_relationship_and_contingency_table
 
-plot_bubblePlot
-scatter_plots_merged
-plot_scatter
+    Categórica - Numérica
+    
+        plot_categorical_numerical_relationship
+        boxplots_grouped
+        plot_histograms_by_categorical_numerical_relationship
+        plot_histograms_grouped
+
+    Numérica - Numérica
+    
+        scatterplot_with_correlation
+
+Análisis multivariante
+----------------------
+
+    3 Categorical Variables
+    
+        plot_tricategorical_analysis
+
+    2 Numerical, 1 Categorical Variables
+    
+        bubleplot
+        scatterplot_3variables
+    
+    4 Variables
+        scatterplot
 
 '''
 
@@ -163,13 +186,17 @@ def plot_multiple_histograms_KDEs_boxplots(df, columns, *, kde=True, boxplot = T
         plt.show()
 
 
-def mostrar_diagramas_violin(df, columnas_numericas):
+def violinplot_multiple(df, columnas_numericas) -> None:
     """
     Muestra una matriz de diagramas de violín para las columnas numéricas especificadas de un DataFrame.
 
-    Args:
-    df (pd.DataFrame): DataFrame que contiene los datos.
-    columnas_numericas (list): Lista de nombres de las columnas numéricas.
+    Parameters:
+    ----------
+    df : pd.DataFrame
+        DataFrame que contiene los datos.
+        
+    columnas_numericas : list
+        Lista de nombres de las columnas numéricas.
     """
     num_cols = len(columnas_numericas)
 
@@ -187,7 +214,7 @@ def mostrar_diagramas_violin(df, columnas_numericas):
     plt.show()
 
 
-def plot_multiple_boxplots(df, columns, dim_matriz_visual = 2):
+def boxplot_multiple(df, columns, dim_matriz_visual = 2) -> None:
     num_cols = len(columns)
     num_rows = num_cols // dim_matriz_visual + num_cols % dim_matriz_visual
     fig, axes = plt.subplots(num_rows, dim_matriz_visual, figsize=(12, 6 * num_rows))
@@ -206,8 +233,7 @@ def plot_multiple_boxplots(df, columns, dim_matriz_visual = 2):
     plt.show()
 
 
-def plot_multiple_lineplots(df, numerical_serie_columns, *, all_together = False, start_date = None, end_date = None
-                            ) -> None:
+def lineplot_multiple(df, numerical_serie_columns, *, all_together = False, start_date = None, end_date = None) -> None:
     '''
     Lineplots of serie-style columns in the DataFrame.
 
@@ -284,7 +310,7 @@ def plot_multiple_lineplots(df, numerical_serie_columns, *, all_together = False
 ##############################################
 '''
 
-def plot_categorical_relationship_fin(df, cat_col1, cat_col2, relative_freq=False, show_values=True, size_group = 5):
+def plot_categorical_relationship(df, cat_col1, cat_col2, relative_freq=False, show_values=True, size_group = 5):
     # Prepara los datos
     count_data = df.groupby([cat_col1, cat_col2]).size().reset_index(name='count')
     total_counts = df[cat_col1].value_counts()
@@ -468,7 +494,7 @@ def plot_categorical_numerical_relationship(df, categorical_col, numerical_col, 
         plt.show()
 
 
-def plot_grouped_boxPlots(df, cat_col, num_col, group_size = 5):
+def boxplots_grouped(df, cat_col, num_col, group_size = 5):
     unique_cats = df[cat_col].unique()
     num_cats = len(unique_cats)
 
@@ -510,7 +536,7 @@ def plot_histograms_by_categorical_numerical_relationship(df, cat_column, num_co
         'Numeric': [10, 15, 8, 12, 9, 11, 13]
     })
     
-    plot_categorical_numerical_relationship(df, 'Category', 'Numeric')
+    plot_histograms_by_categorical_numerical_relationship(df, 'Category', 'Numeric')
     '''
     # Get unique categories in the categorical column
     categories = df[cat_column].unique()
@@ -549,7 +575,7 @@ def plot_histograms_by_categorical_numerical_relationship(df, cat_column, num_co
     plt.show()
 
 
-def plot_grouped_histograms(df, cat_col, num_col, group_size = 3):
+def plot_histograms_grouped(df, cat_col, num_col, group_size = 3):
     unique_cats = df[cat_col].unique()
     num_cats = len(unique_cats)
 
@@ -575,7 +601,7 @@ def plot_grouped_histograms(df, cat_col, num_col, group_size = 3):
 '''
 
 
-def plot_dispersion_with_correlation(df, columna_x, columna_y, tamano_puntos=50, mostrar_correlacion=True):
+def scatterplot_with_correlation(df, columna_x, columna_y, tamano_puntos=50, mostrar_correlacion=True):
     """
     Crea un diagrama de dispersión entre dos columnas y opcionalmente muestra la correlación.
 
@@ -602,7 +628,6 @@ def plot_dispersion_with_correlation(df, columna_x, columna_y, tamano_puntos=50,
     plt.show()
 
 
-
 '''
 ###################################################################################################
 #                                                                                                 #
@@ -610,10 +635,9 @@ def plot_dispersion_with_correlation(df, columna_x, columna_y, tamano_puntos=50,
 #                                                                                                 #
 ###################################################################################################
 '''
-
 '''
 ##############################################
-#         TRES variables CATEGÓRICAS         #
+#           3 Categorical Variables          #
 ##############################################
 '''
 
@@ -632,20 +656,22 @@ def plot_tricategorical_analysis(df, direct_cat_col, cat_col1, cat_col2, relativ
 
     for valor,df_datos in diccionario_multivariante.items():
         print(f"Respuesta {valor}:")
-        plot_categorical_relationship_fin(df_datos,cat_col2,cat_col1, relative_freq= relative, show_values= show_values)
+        plot_categorical_relationship(df_datos,cat_col2,cat_col1, relative_freq= relative, show_values= show_values)
 
 '''
 ##############################################
-#         XXXXXXXXXXXXXXXXXXXXXXXXXX         #
+#     2 Numeric, 1 Categorical Variables     #
 ##############################################
 '''
 
-def plot_bubblePlot(df, col_x, col_y, col_size, scale = 1000):
+def bubleplot(df, col_x, col_y, col_size, scale = 1000):
     """
     Crea un scatter plot usando dos columnas para los ejes X e Y,
     y una tercera columna para determinar el tamaño de los puntos.
 
-    Args:
+    Parameters:
+    ----------
+    
     df (pd.DataFrame): DataFrame de pandas.
     col_x (str): Nombre de la columna para el eje X.
     col_y (str): Nombre de la columna para el eje Y.
@@ -662,16 +688,16 @@ def plot_bubblePlot(df, col_x, col_y, col_size, scale = 1000):
     plt.show()
 
 
-def scatter_plots_merged(df, col_categoria, col_num1, col_num2):
+def scatterplot_3variables(df, col_num1, col_num2, col_cat):
     """
     Genera scatter plots superpuestos de dos columnas numéricas, 
     agrupados y coloreados según una columna categórica.
 
     Args:
     df (pd.DataFrame): DataFrame que contiene los datos.
-    col_categoria (str): Nombre de la columna categórica para agrupar y colorear los datos.
     col_num1 (str): Nombre de la primera columna numérica para el eje X.
     col_num2 (str): Nombre de la segunda columna numérica para el eje Y.
+    col_cat (str): Nombre de la columna categórica para agrupar y colorear los datos.
     """
     # Configuración para mejorar la estética del gráfico
     sns.set(style="whitegrid")
@@ -679,15 +705,15 @@ def scatter_plots_merged(df, col_categoria, col_num1, col_num2):
     plt.figure(figsize=(10, 8))
 
     # Usar seaborn para generar los scatter plots agrupados y coloreados
-    sns.scatterplot(x=col_num1, y=col_num2, hue=col_categoria, data=df, palette="viridis")
+    sns.scatterplot(x=col_num1, y=col_num2, hue=col_cat, data=df, palette="viridis")
 
     # Añadir título y etiquetas
-    plt.title(f'Scatter Plots de {col_num1} vs {col_num2} Agrupados por {col_categoria}')
+    plt.title(f'{col_num1} vs {col_num2} Scatterplot, gruoped by {col_cat}')
     plt.xlabel(col_num1)
     plt.ylabel(col_num2)
 
     # Mostrar leyenda y gráfico
-    plt.legend(title=col_categoria)
+    plt.legend(title=col_cat)
     plt.show()
 
     # Uso de la función
@@ -696,7 +722,13 @@ def scatter_plots_merged(df, col_categoria, col_num1, col_num2):
     return
 
 
-def plot_scatter(df, num_col1, num_col2, cat_col=None, point_size=50, scale=1, show_legend=True):
+'''
+##############################################
+#                 4 Variables                #
+##############################################
+'''
+
+def scatterplot(df, num_col1, num_col2, cat_col=None, point_size=50, scale=1, show_legend=True):
     """
     Plots a scatter diagram from `df` of `num_col1` vs `num_col2` using `cat_col` for coloring
     the points, and `point_size * scale` for determining the size of the points. If no `cat_col` is 
@@ -730,7 +762,7 @@ def plot_scatter(df, num_col1, num_col2, cat_col=None, point_size=50, scale=1, s
     --------
         # Assume df is a DataFrame with appropriate columns
         df['log_population'] = np.log10(df['population_total'])
-        plot_scatter(
+        scatterplot(
             df=df,
             num_col1='longitude',
             num_col2='latitude',
@@ -765,100 +797,5 @@ def plot_scatter(df, num_col1, num_col2, cat_col=None, point_size=50, scale=1, s
     plt.ylabel(num_col2)
     plt.title(f'Scatter Plot of {num_col1} vs {num_col2}')
     plt.show()
-
-
-
-'''
-###################################################################################################
-#                                                                                                 #
-#   WARNING     WARNING     WARNING     WARNING     WARNING     WARNING     WARNING     WARNING   #
-#                                                                                                 #
-###################################################################################################
-#                                                                                                 #
-#   DEPRECATED FUNCTIONS                DEPRECATED FUNCTIONS                DEPRECATED FUNCTIONS  #
-#                                                                                                 #
-###################################################################################################
-'''
-
-def plot_categorical_distribution(df, categorical_columns, relative = False, show_values = True, rotation = 45):
-    '''
-    Dibuja una matriz de gráficas de 2 columnas y tantas filas como necesite 
-    para pintar el diagrama de barras de las frecuencias absolutas o relativas 
-    pasadas como argumento.
     
-    Parameters
-    ----------
-    df : pandas.DataFrame
-
-    categorical_columns : list
-        Columnas categóricas    
-
-    relative : bool
-        If True, calcula la frecuencia relativa
-        
-    rotation : int
-        Ángulo de giro de las etiquetas del eje x
-    '''
-    num_columnas = len(categorical_columns)
-    num_filas = (num_columnas // 2) + (num_columnas % 2)
-
-    if num_columnas == 1:
-        fig, axs = plt.subplots(1, 1, figsize=(15, 5))
-    else:
-        fig, axs = plt.subplots(num_filas, 2, figsize=(15, 5 * num_filas))
-    axs = axs.flatten()     # Return a copy of the array collapsed into one dimension.
-
-    for i, col in enumerate(categorical_columns):
-        ax = axs[i]
-        if relative:    
-            total = df[col].value_counts().sum()
-            serie = df[col].value_counts().apply(lambda x: x / total)
-            sns.barplot(x = serie.index, y = serie, ax = ax, palette = 'viridis', hue = serie.index, legend = False)
-            ax.set_ylabel('Frecuencia Relativa')
-        else:
-            serie = df[col].value_counts()
-            sns.barplot( x = serie.index, y = serie, ax = ax, palette = 'viridis', hue = serie.index, legend = False)
-            ax.set_ylabel('Frecuencia')
-
-        ax.set_title(f'Distribución de {col}')
-        ax.set_xlabel('')
-        ax.tick_params(axis = 'x', rotation = rotation)
-
-        if show_values:
-            for p in ax.patches:
-                height = p.get_height()
-                ax.annotate(f'{height:.2f}', (p.get_x() + p.get_width() / 2., height), 
-                            ha='center', va='center', xytext=(0, 9), textcoords='offset points')
-
-    for j in range(i + 1, num_filas * 2):
-        axs[j].axis('off')
-
-    plt.tight_layout()
-    plt.show()
     
-  
-def OLD_plot_histogram_KDE_boxPlot(df, columns, whisker_width=1.5, bins = None):
-    num_cols = len(columns)
-    if num_cols:
-        
-        fig, axes = plt.subplots(num_cols, 2, figsize=(12, 5 * num_cols))
-        print(axes.shape)
-
-        for i, column in enumerate(columns):
-            if df[column].dtype in ['int64', 'float64']:
-                # Histograma y KDE
-                sns.histplot(df[column], kde=True, ax=axes[i,0] if num_cols > 1 else axes[0], bins= "auto" if not bins else bins)
-                if num_cols > 1:
-                    axes[i,0].set_title(f'Histograma y KDE de {column}')
-                else:
-                    axes[0].set_title(f'Histograma y KDE de {column}')
-
-                # Boxplot
-                sns.boxplot(x=df[column], ax=axes[i,1] if num_cols > 1 else axes[1], whis=whisker_width)
-                if num_cols > 1:
-                    axes[i,1].set_title(f'Boxplot de {column}')
-                else:
-                    axes[1].set_title(f'Boxplot de {column}')
-
-        plt.tight_layout()
-        plt.show()
