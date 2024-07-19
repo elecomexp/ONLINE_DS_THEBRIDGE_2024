@@ -1,0 +1,25 @@
+id,descripcion,tipo_datos,requerido,unidad
+indicativo,Indicativo de la estación,string,True,
+nombre,Nombre de la estación,string,True,
+ubicacion,Ubicación de la estación,string,True,
+codigo,Código de la variable,string,True,
+temMin,Temperatura mínima absoluta de la estación. Contiene 13 campos correspondientes a los 12 meses del año y el último a la mínima absoluta,array de string,True,décimas de °C
+diaMin,Día del mes en que se dio la mínima absoluta de la estación. Contiene 13 campos correspondientes a los 12 meses del año y el último al día de la mínima absoluta,array de string,True,
+anioMin,Año en que se dio la mímina absoluta de la estación. Contiene 13 campos correspondientes a los 12 meses del año y el último al año de la mínima absoluta,array de string,True,
+mesMin,Mes en que se dio la mínima absoluta de la estación,string,True,
+temMax,Temperatura máxima absoluta de la estación. Contiene 13 campos correspondientes a los 12 meses del año y el último a la máxima absoluta,array de string,True,décimas de °C
+diaMax,Día del mes en que se dio la máxima absoluta de la estación. Contiene 13 campos correspondientes a los 12 meses del año y el último al día de la máxima absoluta,array de string,True,
+anioMax,Año en que se dio la máxima absoluta de la estación. Contiene 13 campos correspondientes a los 12 meses del año y el último al año de la máxima absoluta,array de string,True,
+mesMax,Mes en que se dio la máxima absoluta de la estación,string,True,
+temMedBaja,Temperatura media mensual más baja de la estación. Contiene 13 campos correspondientes a los 12 meses del año y el último a la mínima absoluta,array de string,True,décimas de °C
+anioMedBaja,Año en que se dio la temperatura media mensual más baja de la estación. Contiene 13 campos correspondientes a los 12 meses del año y el último al año de la mínima absoluta,array de string,True,
+mesMedBaja,Mes en que se dio la temperatura media mensual más baja de la estación,string,True,
+temMedAlta,Temperatura media mensual mas alta de la estación. Contiene 13 campos correspondientes a los 12 meses del año y el último a la máxima absoluta,array de string,True,décimas de °C
+anioMedAlta,Año en que se dio la temperatura media mensual más alta de la estación. Contiene 13 campos correspondientes a los 12 meses del año y el último al año de la máxima absoluta,array de string,True,
+mesMedAlta,Mes en que se dio la temperatura media mensual más alta de la estación,string,True,
+temMedMin,Temperatura media de las mínimas más baja de la estación. Contiene 13 campos correspondientes a los 12 meses del año y el último a la mínima absoluta,array de string,True,décimas de °C
+anioMedMin,Año en que se dio la temperatura media de las mínima más baja de la estación. Contiene 13 campos correspondientes a los 12 meses del año y el último al año de la mínima absoluta,array de string,True,
+mesMedMin,Mes en que se dio la temperatura media de las mínima más baja de la estación,string,True,
+temMedMax,Temperatura media de las máximas más alta de la estación. Contiene 13 campos correspondientes a los 12 meses del año y el último a la máxima absoluta,array de string,True,décimas de °C
+anioMedMax,Año en que se dio la temperatura media de las máximas más alta de la estación. Contiene 13 campos correspondientes a los 12 meses del año y el último al año de la máxima absoluta,array de string,True,
+mesMedMax,Mes en que se dio la temperatura media de las máximas más alta de la estación,string,True,
