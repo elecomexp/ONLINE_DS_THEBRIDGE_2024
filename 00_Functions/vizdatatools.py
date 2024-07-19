@@ -611,6 +611,35 @@ def plot_dispersion_with_correlation(df, columna_x, columna_y, tamano_puntos=50,
 ###################################################################################################
 '''
 
+'''
+##############################################
+#         TRES variables CATEGÓRICAS         #
+##############################################
+'''
+
+# Función de Alberto. S07, U02, Práctica obligatoria
+def plot_tricategorical_analysis(df, direct_cat_col, cat_col1, cat_col2, relative = False, show_values = True):
+    '''   
+    
+    Example:
+    -------
+    plot_tricategorical_analysis(df_titanic, "class", ["alive","who"])
+    '''
+
+    diccionario_multivariante = {}
+    for valor in df[direct_cat_col].unique():
+        diccionario_multivariante[valor] = df.loc[df[direct_cat_col] == valor,[cat_col2,cat_col1]] 
+
+    for valor,df_datos in diccionario_multivariante.items():
+        print(f"Respuesta {valor}:")
+        plot_categorical_relationship_fin(df_datos,cat_col2,cat_col1, relative_freq= relative, show_values= show_values)
+
+'''
+##############################################
+#         XXXXXXXXXXXXXXXXXXXXXXXXXX         #
+##############################################
+'''
+
 def plot_bubblePlot(df, col_x, col_y, col_size, scale = 1000):
     """
     Crea un scatter plot usando dos columnas para los ejes X e Y,
