@@ -190,7 +190,7 @@ def violinplot_multiple(df, columnas_numericas) -> None:
     """
     Muestra una matriz de diagramas de violín para las columnas numéricas especificadas de un DataFrame.
 
-    Parameters:
+    Parameters
     ----------
     df : pd.DataFrame
         DataFrame que contiene los datos.
@@ -378,7 +378,7 @@ def plot_absolute_categorical_relationship_and_contingency_table(df, col1, col2)
     2. Creates a catplot with the second categorical column as the 'col' argument for comparison.
     3. Returns the contingency table of the two columns.
     
-    Parameters:
+    Parameters
     -----------
     df : pd.DataFrame
         The input DataFrame containing the data.
@@ -389,11 +389,11 @@ def plot_absolute_categorical_relationship_and_contingency_table(df, col1, col2)
     col2 : str
         The name of the second categorical column.
     
-    Returns:
+    Returns
     --------
     pd.DataFrame: A contingency table showing the frequency distribution of the two categorical columns.
     
-    Example:
+    Example
     --------
     df = pd.DataFrame({
         'Category1': ['A', 'B', 'A', 'C', 'B', 'A', 'C'],
@@ -514,7 +514,7 @@ def plot_histograms_by_categorical_numerical_relationship(df, cat_column, num_co
     '''
     Generate a grid of histograms to compare a categorical variable with a numerical variable.
     
-    Parameters:
+    Parameters
     -----------
     df : pd.DataFrame
         The input DataFrame containing the data.
@@ -525,11 +525,11 @@ def plot_histograms_by_categorical_numerical_relationship(df, cat_column, num_co
     num_column : str
         The name of the numerical column in the DataFrame.
     
-    Returns:
+    Returns
     --------
     None (displays plots)
     
-    Example:
+    Example
     --------
     df = pd.DataFrame({
         'Category': ['A', 'B', 'A', 'C', 'B', 'A', 'C'],
@@ -605,12 +605,22 @@ def scatterplot_with_correlation(df, columna_x, columna_y, tamano_puntos=50, mos
     """
     Crea un diagrama de dispersión entre dos columnas y opcionalmente muestra la correlación.
 
-    Args:
-    df (pandas.DataFrame): DataFrame que contiene los datos.
-    columna_x (str): Nombre de la columna para el eje X.
-    columna_y (str): Nombre de la columna para el eje Y.
-    tamano_puntos (int, opcional): Tamaño de los puntos en el gráfico. Por defecto es 50.
-    mostrar_correlacion (bool, opcional): Si es True, muestra la correlación en el gráfico. Por defecto es False.
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        DataFrame que contiene los datos.
+        
+    columna_x : str
+        Nombre de la columna para el eje X.
+        
+    columna_y : str
+        Nombre de la columna para el eje Y.
+        
+    tamano_puntos : int, opcional
+        Tamaño de los puntos en el gráfico. Por defecto es 50.
+        
+    mostrar_correlacion : bool, opcional
+        Si es True, muestra la correlación en el gráfico. Por defecto es False.
     """
 
     plt.figure(figsize=(10, 6))
@@ -644,8 +654,7 @@ def scatterplot_with_correlation(df, columna_x, columna_y, tamano_puntos=50, mos
 # Función de Alberto. S07, U02, Práctica obligatoria
 def plot_tricategorical_analysis(df, direct_cat_col, cat_col1, cat_col2, relative = False, show_values = True):
     '''   
-    
-    Example:
+    Example
     -------
     plot_tricategorical_analysis(df_titanic, "class", ["alive","who"])
     '''
@@ -669,13 +678,19 @@ def bubleplot(df, col_x, col_y, col_size, scale = 1000):
     Crea un scatter plot usando dos columnas para los ejes X e Y,
     y una tercera columna para determinar el tamaño de los puntos.
 
-    Parameters:
+    Parameters
     ----------
-    
-    df (pd.DataFrame): DataFrame de pandas.
-    col_x (str): Nombre de la columna para el eje X.
-    col_y (str): Nombre de la columna para el eje Y.
-    col_size (str): Nombre de la columna para determinar el tamaño de los puntos.
+    df : pd.DataFrame
+        DataFrame de pandas.
+        
+    col_x : str
+        Nombre de la columna para el eje X.
+        
+    col_y : str
+        Nombre de la columna para el eje Y.
+        
+    col_size : str
+        Nombre de la columna para determinar el tamaño de los puntos.
     """
 
     # Asegúrate de que los valores de tamaño sean positivos
@@ -693,11 +708,19 @@ def scatterplot_3variables(df, col_num1, col_num2, col_cat):
     Genera scatter plots superpuestos de dos columnas numéricas, 
     agrupados y coloreados según una columna categórica.
 
-    Args:
-    df (pd.DataFrame): DataFrame que contiene los datos.
-    col_num1 (str): Nombre de la primera columna numérica para el eje X.
-    col_num2 (str): Nombre de la segunda columna numérica para el eje Y.
-    col_cat (str): Nombre de la columna categórica para agrupar y colorear los datos.
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame que contiene los datos.
+        
+    col_num1 : str
+        Nombre de la primera columna numérica para el eje X.
+        
+    col_num2 : str
+        Nombre de la segunda columna numérica para el eje Y.
+        
+    col_cat : str
+        Nombre de la columna categórica para agrupar y colorear los datos.
     """
     # Configuración para mejorar la estética del gráfico
     sns.set(style="whitegrid")
@@ -735,7 +758,7 @@ def scatterplot(df, num_col1, num_col2, cat_col=None, point_size=50, scale=1, sh
     provided, no color parameter is passed to the plotting function.
     `show_legend` doesn't work yet
 
-    Parameters:
+    Parameters
     ----------
     df : pd.DataFrame
         DataFrame containing the data.
@@ -758,7 +781,7 @@ def scatterplot(df, num_col1, num_col2, cat_col=None, point_size=50, scale=1, sh
     show_legend : bool
         Whether to show the legend for colors and sizes. Default is True.
 
-    Example:
+    Example
     --------
         # Assume df is a DataFrame with appropriate columns
         df['log_population'] = np.log10(df['population_total'])
