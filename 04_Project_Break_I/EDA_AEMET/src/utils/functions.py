@@ -18,24 +18,29 @@ def fetch_data_aemet(url, headers, querystring, retries = 3, wait_time = 65):
     Parameters
     ----------
     url : str
-        The URL of the AEMET API endpoint.  
+        The URL of the AEMET API endpoint. 
+        
     headers : dict
         A dictionary of HTTP headers to send with the request.
+        
     querystring : dict      
         A dictionary of query parameters to send with the request.
+        
     retries : int, optional     
         The number of times to retry the request if rate limited. Default is 3.
+        
     wait_time : int, optional       
         The number of seconds to wait before retrying if rate limited. Default is 70.
 
     Returns
     -------
-    pd.DataFrame: A pandas DataFrame containing the response data if the request is successful.
+    pd.DataFrame : A pandas DataFrame containing the response data if the request is successful.
 
     Raises
     ------
-    requests.exceptions.HTTPError: If an HTTP error other than rate limiting occurs.
-    KeyError: If the 'datos' key is not found in the JSON response.
+    requests.exceptions.HTTPError : If an HTTP error other than rate limiting occurs.
+    
+    KeyError : If the 'datos' key is not found in the JSON response.
     """
     for attempt in range(retries):
         try:

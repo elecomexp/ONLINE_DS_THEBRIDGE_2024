@@ -54,9 +54,9 @@ def split_by_uppercase(text) -> str:
     return ' '.join(strings)
 
 
-scipy.stats.mannwhitneyu()
+# scipy.stats.mannwhitneyu()
 
-scipy.stats.f_oneway()
+# scipy.stats.f_oneway()
 
 def mapa_calor(corr_matrix):
     '''
