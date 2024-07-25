@@ -49,6 +49,8 @@ Análisis multivariante
 
 '''
 
+from matplotlib.dates import AutoDateLocator, AutoDateFormatter
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -266,7 +268,8 @@ def lineplot_multiple(df, numerical_serie_columns, *, all_together = False, star
     if all_together:
         fig, ax = plt.subplots(1, 1, figsize=(7, 5))
         for col in numerical_serie_columns:
-            sns.lineplot(x = df.index, y = df[col], data = df, ax = ax, label = col)
+            sns.lineplot(data = df, x = df.index, y = df[col], ax = ax, label = col)
+        ax.set_xlim(df.index.min(), df.index.max())
         ax.set_title('All Columns: Line-Plot')
         ax.set_xlabel(f'{df.index.name}')
         ax.set_ylabel('Values')

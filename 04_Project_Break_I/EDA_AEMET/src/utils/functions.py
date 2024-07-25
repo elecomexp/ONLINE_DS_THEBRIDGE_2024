@@ -6,6 +6,17 @@ import pandas as pd
 import requests
 
 
+def show_AWS_info(df):
+    '''
+    Show idema, location and service time of all AWS in a DataFrame.
+    '''
+    for idema in df['idema'].unique():   
+        AWS_name = df[df['idema'] == idema]['nombre'].unique()[0]
+        min_date = df[df['idema'] == idema]['fecha'].min().strftime('%Y-%m')
+        max_date = df[df['idema'] == idema]['fecha'].max().strftime('%Y-%m')
+        print(f'{idema} : {AWS_name} --> Data from {min_date} to {max_date}.')   
+
+
 def fetch_data_aemet(url, headers, querystring, retries = 3, wait_time = 65):
     """
     Fetch data from the AEMET API with retry logic for rate limiting.
