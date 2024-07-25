@@ -7,18 +7,47 @@ import seaborn as sns
 import scipy.stats
 
 
-def get_cardinality_class(df_in, umbral_categoria = 10, umbral_continua = 30):
+def get_cardinality_class(df_in, threshold_categorical = 10, threshold_continuous = 30):
     '''
-    Define qué tipo de variable es cada columna de un pandas.DataFrame en función de su cardinalidad.
+    Categorizes each column of `df_in` in a pandas.DataFrame based on its cardinality.
+
+    Parameters
+    ----------
+    df_in : pandas.DataFrame
+        The input DataFrame containing the data to be analyzed.
+        
+    threshold_categorical : int, optional
+        The threshold for determining categorical variables. Columns with unique values 
+        less than this threshold are considered categorical. Default is 10.
+        
+    threshold_continuous : int, optional
+        The threshold percentage for determining continuous numerical variables. Columns with a 
+        cardinality percentage higher than this threshold are considered continuous numerical. Default is 30.
+
+    Returns
+    -------
+    pandas.DataFrame with columns:
+        - 'Card': The cardinality of each column.
+        - '%_Card': The percentage cardinality of each column relative to the total number of rows.
+        - 'Tipo': The data type of each column.
+        - 'Clase': The assigned variable class for each column based on the specified thresholds.
+
+    Notes
+    -----
+    The function assigns variable classes as follows:
+        - 'Categoric' for columns with cardinality less than `threshold_categorical`.
+        - 'Binary' for columns with exactly 2 unique values.
+        - 'Numeric - Discrete' for columns with cardinality greater than or equal to `threshold_categorical`.
+        - 'Numeric - Continuous' for columns with a cardinality percentage greater than `threshold_continuous`.
     '''
     df_out = pd.DataFrame([df_in.nunique(), df_in.nunique()/len(df_in) * 100, df_in.dtypes])
     df_out = df_out.T.rename(columns = {0: "Card", 1: "%_Card", 2: "Tipo"})
     
 
-    df_out.loc[df_out["Card"] < umbral_categoria, "Clase"] = "Categórica"    
-    df_out.loc[df_out["Card"] == 2, "Clase"] = "Binaria"
-    df_out.loc[df_out["Card"] >= umbral_categoria, "Clase"] ="Numérica Discreta"
-    df_out.loc[df_out["%_Card"] > umbral_continua, "Clase"] = "Numérica Continua"
+    df_out.loc[df_out["Card"] < threshold_categorical, "Clase"] = "Categoric"    
+    df_out.loc[df_out["Card"] == 2, "Clase"] = "Binary"
+    df_out.loc[df_out["Card"] >= threshold_categorical, "Clase"] ="Numeric - Discrete"
+    df_out.loc[df_out["%_Card"] > threshold_continuous, "Clase"] = "Numeric - Continuous"
     
     return df_out
 
