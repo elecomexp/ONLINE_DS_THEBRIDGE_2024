@@ -8,7 +8,24 @@ import requests
 
 def show_AWS_info(df):
     '''
-    Show idema, location and service time of all AWS in a DataFrame.
+    Display information about each Automated Weather Station (AWS) in the DataFrame.
+
+    This function iterates over the unique 'idema' values in the provided DataFrame and prints
+    the idema, location name, and the service time (i.e., the range of dates for which data is available)
+    for each AWS.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        The DataFrame containing AWS data. It is expected to have at least the following columns:
+        - 'idema': A unique identifier for each AWS.
+        - 'nombre': The name of the AWS location.
+        - 'fecha': The dates for which data is available, in a datetime format.
+
+    Returns
+    -------
+    None
+        This function does not return any value. It only prints information to the console.
     '''
     for idema in df['idema'].unique():   
         AWS_name = df[df['idema'] == idema]['nombre'].unique()[0]
