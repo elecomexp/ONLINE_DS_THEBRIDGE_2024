@@ -435,82 +435,131 @@ def plot_absolute_categorical_relationship_and_contingency_table(df, col1, col2)
 ##############################################
 '''
 
-def plot_categorical_numerical_relationship(df, categorical_col, numerical_col, show_values = True, measure = 'mean'):
-    # Calcula la medida de tendencia central (mean o median)
+def plot_categorical_numerical_relationship(df, categorical_col, numerical_col, show_values=True, measure='mean'):
+    """
+    Plot the relationship between a categorical column and a numerical column using bar plots.
+    
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        The DataFrame containing the data.
+        
+    categorical_col : str
+        The name of the categorical column.
+        
+    numerical_col : str
+        The name of the numerical column.
+        
+    show_values : bool, optional
+        Whether to show the values on the bars. Default is True.
+        
+    measure : str, optional
+        The measure of central tendency to use ('mean' or 'median'). Default is 'mean'.
+    
+    Returns
+    -------
+    None
+    """
+    # Calculate the central tendency measure (mean or median)
     if measure == 'median':
         grouped_data = df.groupby(categorical_col)[numerical_col].median()
     else:
-        # Por defecto, usa la media
+        # Default is mean
         grouped_data = df.groupby(categorical_col)[numerical_col].mean()
 
-    # Ordena los valores
+    # Sort the values
     grouped_data = grouped_data.sort_values(ascending=False)
 
-    # Si hay más de 5 categorías, las divide en grupos de 5
+    # If there are more than 5 categories, split them into groups of 5
     if grouped_data.shape[0] > 5:
         unique_categories = grouped_data.index.unique()
         num_plots = int(np.ceil(len(unique_categories) / 5))
 
         for i in range(num_plots):
-            # Selecciona un subconjunto de categorías para cada gráfico
+            # Select a subset of categories for each plot
             categories_subset = unique_categories[i * 5:(i + 1) * 5]
             data_subset = grouped_data.loc[categories_subset]
 
-            # Crea el gráfico
+            # Create the plot
             plt.figure(figsize=(10, 6))
             ax = sns.barplot(x=data_subset.index, y=data_subset.values)
 
-            # Añade títulos y etiquetas
-            plt.title(f'Relación entre {categorical_col} y {numerical_col} - Grupo {i + 1}')
+            # Add titles and labels
+            plt.title(f'Relationship between {categorical_col} and {numerical_col} - Group {i + 1}')
             plt.xlabel(categorical_col)
-            plt.ylabel(f'{measure.capitalize()} de {numerical_col}')
+            plt.ylabel(f'{measure.capitalize()} of {numerical_col}')
             plt.xticks(rotation=45)
 
-            # Mostrar valores en el gráfico
+            # Show values on the plot
             if show_values:
                 for p in ax.patches:
                     ax.annotate(f'{p.get_height():.2f}', (p.get_x() + p.get_width() / 2., p.get_height()),
                                 ha='center', va='center', fontsize=10, color='black', xytext=(0, 5),
                                 textcoords='offset points')
 
-            # Muestra el gráfico
+            # Display the plot
             plt.show()
     else:
-        # Crea el gráfico para menos de 5 categorías
+        # Create the plot for less than 5 categories
         plt.figure(figsize=(10, 6))
         ax = sns.barplot(x=grouped_data.index, y=grouped_data.values)
 
-        # Añade títulos y etiquetas
-        plt.title(f'Relación entre {categorical_col} y {numerical_col}')
+        # Add titles and labels
+        plt.title(f'Relationship between {categorical_col} and {numerical_col}')
         plt.xlabel(categorical_col)
-        plt.ylabel(f'{measure.capitalize()} de {numerical_col}')
+        plt.ylabel(f'{measure.capitalize()} of {numerical_col}')
         plt.xticks(rotation=45)
 
-        # Mostrar valores en el gráfico
+        # Show values on the plot
         if show_values:
             for p in ax.patches:
                 ax.annotate(f'{p.get_height():.2f}', (p.get_x() + p.get_width() / 2., p.get_height()),
                             ha='center', va='center', fontsize=10, color='black', xytext=(0, 5),
                             textcoords='offset points')
 
-        # Muestra el gráfico
+        # Display the plot
         plt.show()
 
 
-def boxplots_grouped(df, cat_col, num_col, group_size = 5):
+def boxplots_grouped(df, cat_col, num_col, group_size=5):
+    """
+    Create boxplots for a numerical column grouped by a categorical column in subsets.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        The DataFrame containing the data.
+
+    cat_col : str
+        The name of the categorical column.
+
+    num_col : str
+        The name of the numerical column.
+
+    group_size : int, optional
+        The number of categories to include in each subset. Default is 5.
+
+    Returns
+    -------
+    None
+    """
+    # Get the unique categories and the number of categories
     unique_cats = df[cat_col].unique()
     num_cats = len(unique_cats)
 
-
+    # Loop through the categories in groups of `group_size`
     for i in range(0, num_cats, group_size):
+        # Select a subset of categories
         subset_cats = unique_cats[i:i+group_size]
         subset_df = df[df[cat_col].isin(subset_cats)]
         
+        # Create the boxplot
         plt.figure(figsize=(10, 6))
         sns.boxplot(x=cat_col, y=num_col, data=subset_df)
         plt.title(f'Boxplots of {num_col} for {cat_col} (Group {i//group_size + 1})')
         plt.xticks(rotation=45)
         plt.show()
+
 
 
 def plot_histograms_by_categorical_numerical_relationship(df, cat_column, num_column):
