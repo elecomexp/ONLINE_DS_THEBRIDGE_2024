@@ -435,7 +435,7 @@ def plot_absolute_categorical_relationship_and_contingency_table(df, col1, col2)
 ##############################################
 '''
 
-def plot_categorical_numerical_relationship(df, categorical_col, numerical_col, show_values=True, measure='mean'):
+def plot_categorical_numerical_relationship(df, categorical_col, numerical_col, show_values=True, measure='mean', group_size = 5):
     """
     Plot the relationship between a categorical column and a numerical column using bar plots.
     
@@ -470,14 +470,14 @@ def plot_categorical_numerical_relationship(df, categorical_col, numerical_col, 
     # Sort the values
     grouped_data = grouped_data.sort_values(ascending=False)
 
-    # If there are more than 5 categories, split them into groups of 5
-    if grouped_data.shape[0] > 5:
+    # If there are more than group_size categories, split them into groups of group_size
+    if grouped_data.shape[0] > group_size:
         unique_categories = grouped_data.index.unique()
-        num_plots = int(np.ceil(len(unique_categories) / 5))
+        num_plots = int(np.ceil(len(unique_categories) / group_size))
 
         for i in range(num_plots):
             # Select a subset of categories for each plot
-            categories_subset = unique_categories[i * 5:(i + 1) * 5]
+            categories_subset = unique_categories[i * group_size:(i + 1) * group_size]
             data_subset = grouped_data.loc[categories_subset]
 
             # Create the plot
@@ -500,7 +500,7 @@ def plot_categorical_numerical_relationship(df, categorical_col, numerical_col, 
             # Display the plot
             plt.show()
     else:
-        # Create the plot for less than 5 categories
+        # Create the plot for less than group_size categories
         plt.figure(figsize=(10, 6))
         ax = sns.barplot(x=grouped_data.index, y=grouped_data.values)
 
