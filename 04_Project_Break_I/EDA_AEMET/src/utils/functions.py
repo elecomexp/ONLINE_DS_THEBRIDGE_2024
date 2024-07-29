@@ -1,8 +1,22 @@
+'''
+Author: Lander Combarro Exposito
+Date: 2024-07-30
+
+Module Functions
+----------------
+- show_AWS_info
+- scatterplot_with_background
+- fetch_data_aemet
+- convert_coordinate
+'''
+
 import re
 import time
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import seaborn as sns
 import requests
 
 
@@ -32,6 +46,62 @@ def show_AWS_info(df):
         min_date = df[df['idema'] == idema]['fecha'].min().strftime('%Y-%m')
         max_date = df[df['idema'] == idema]['fecha'].max().strftime('%Y-%m')
         print(f'{idema} : {AWS_name} --> Data from {min_date} to {max_date}.')   
+
+
+def scatterplot_with_background(df, x, y, hue, size, image, year):
+    """
+    Create a scatter plot with a background image and annotate points with station names.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        DataFrame containing the data to be plotted.
+        
+    x : str
+        Name of the column in df to be used for the x-axis.
+        
+    y : str
+        Name of the column in df to be used for the y-axis.
+        
+    hue : str
+        Name of the column in df to be used for color coding the points.
+        
+    size : str
+        Name of the column in df to be used for sizing the points.
+        
+    image : str or array-like
+        Path to the background image or array representing the image to be displayed.
+        
+    year : int
+        Year for which the data is being plotted. Used in the title of the plot.
+
+    Returns
+    -------
+    None
+        This function displays a scatter plot with a background image and annotations.
+    """
+    fig, ax = plt.subplots(figsize=(9, 7))
+
+    # Add the background image, adjusting the values according to the data
+    extent = [-3.55, -1.55, 42.47, 43.47]
+    ax.imshow(image, extent=extent, aspect='auto', alpha=0.3)
+
+    scatter = sns.scatterplot(data=df, x=x, y=y, hue=hue, size=size,
+                            sizes=(20, 200), palette='viridis', alpha=0.6, legend=True, ax = ax)
+
+    # Add station names as annotations, centered and above the points
+    for i in range(df.shape[0]):
+        ax.annotate(df.iloc[i]['nombre'], (df.iloc[i][x], df.iloc[i][y]), fontsize=8,
+                    ha='center', va='bottom')
+
+    ax.set_xlim([-3.55, -1.5])
+    ax.set_ylim([42.45, 43.55])
+    
+    ax.set_xlabel(x)
+    ax.set_ylabel(y)
+    ax.set_title(f'Year: {str(year)}')
+
+    plt.show()
 
 
 def fetch_data_aemet(url, headers, querystring, retries = 3, wait_time = 65):

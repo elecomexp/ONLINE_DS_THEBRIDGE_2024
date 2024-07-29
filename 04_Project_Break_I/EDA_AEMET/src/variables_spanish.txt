@@ -5,6 +5,8 @@ Estas son las variables que tiene el dataset extraido de AEMET
 - nombre : nombre (ubicación) de la estación, string
 - provincia : provincia de la estación, string
 - altitud : altitud de la estación en m sobre el nivel del mar, m
+- longitud : coordenadas de longitud, grados
+- latitud : coordenadas de latitud, grados
  
 - tm_mes : Temperatura media mensual, °C
 - tm_max : Temperatura media mensual de las máximas, °C
