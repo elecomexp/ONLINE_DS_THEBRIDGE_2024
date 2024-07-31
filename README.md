@@ -1,3 +1,3 @@
-Repositorio del Bootcamp "Data Science" de "The Bridge".
+# Bootcamp en Data Science impartido por The Bridge
 
-Convocatoria mayo-diciembre 2024.
+Aquí se almacenará todo el material, proyectos y ejercicios que he desarrollado durante el curso mayo-diciembre 2024.
