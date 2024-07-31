@@ -35,19 +35,6 @@ The project is organized into the following main directories:
   - There are 30-40 more extreme-heat days per year compared to 100 years ago.
 - **Challenges**: Challenges faced include accessing the data, handling missing data, ensuring data consistency, and visualizing long-term trends.
 
-## Key Scripts and Notebooks
-
-- **main.py**: The main script for running the analysis.
-- **requirements.txt**: List of dependencies required to run the project.
-- **variables.py**: File containing variable definitions used across the project.
-- **Notebooks**: 
-  - Various Jupyter notebooks used for data exploration, visualization, and analysis.
-
-## Visualizations
-
-- Scatter plots with background images showing station locations and temperature trends.
-- Bar plots and boxplots grouped by decade and province to visualize trends in extreme weather events.
-
 ## Getting Started
 
 1. Clone the repository.
