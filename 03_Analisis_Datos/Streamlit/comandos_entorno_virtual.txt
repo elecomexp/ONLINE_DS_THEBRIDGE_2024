@@ -4,9 +4,9 @@ virtualenv entorno_virtual --> crear entorno virtual
 
 rm -r entorno_virtual
 
-(source) entorno_virtual/Scripts/activate --> activar entorno virtual (creo que source es si no estás en el path)
-(source) entorno_virtual/bin/activate --> activar entorno virtual en MAC
-deactivate --> Desactivar el entorno virtual
+source entorno_virtual/Scripts/activate --> activar entorno virtual en Windowscd("source" es para ejecutar)
+source entorno_virtual/bin/activate --> activar entorno virtual en MAC
+deactivate --> Desactivar el entorno virtual (a secas, sin nada por delante)
 
 virtualenv entorno_virtual -p path\to\new_python.exe --> Crear un entorno virtual con una versión especifíca de python
 
@@ -20,4 +20,4 @@ pip freeze > requirements.txt --> exportar los nombres de las librerías instala
 
 pip uninstall -r requirements.txt -y --> desinstalar todas las librerías del requirements.txt. Aplicable tanto a tu ordenador como a tu entorno virtual.
 
-____ run main.py  --> Desde la terminal "git bash" y con el entorno virtual activado
+streamlit run main.py  --> Desde la terminal "git bash" y con el entorno virtual activado
