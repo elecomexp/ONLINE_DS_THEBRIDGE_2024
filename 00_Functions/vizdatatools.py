@@ -233,7 +233,7 @@ def boxplot_multiple(df, columns, dim_matriz_visual = 2) -> None:
     plt.show()
 
 
-def lineplot_multiple(df, numerical_serie_columns, *, all_together = False, start_date = None, end_date = None) -> None:
+def lineplot_multiple(df, numerical_serie_columns, *, all_together=False, start_date=None, end_date=None) -> None:
     '''
     Lineplots of serie-style columns in the DataFrame.
 
