@@ -74,53 +74,6 @@ def split_by_uppercase(text) -> str:
     return ' '.join(strings)
 
 
-def show_coefs(model, figsize=(10, 5)):
-    '''
-    Visualizes the coefficients of a fitted regression model.
-
-    This function creates a horizontal bar plot of the model's coefficients.
-    It displays two subplots: one showing the original coefficients and the other
-    showing the absolute values of the coefficients sorted in ascending order. 
-    Additionally, it returns a DataFrame containing the coefficients.
-
-    Parameters
-    ----------
-    model : sklearn.base.RegressorMixin
-        A fitted scikit-learn regression model. The model should have the attributes 
-        `coef_` (the model's coefficients) and `feature_names_in_` (the names of the features).
-    
-    figsize : tuple, optional, default=(10, 5)
-        The size of the figure for the bar plots. It is passed to `matplotlib.pyplot.subplots`.
-    
-    Returns
-    -------
-    df_coef : pandas.DataFrame
-        A DataFrame containing the coefficients of the model. The index consists of the feature 
-        names and the single column is labeled "coefs".
-    
-    Example
-    -------
-    >>> from sklearn.linear_model import Ridge
-    >>> model = Ridge().fit(X_train, y_train)
-    >>> show_coefs(model)
-    
-    Notes
-    -----
-    This function requires the model to have been trained on the dataset with the `coef_` 
-    and `feature_names_in_` attributes, which are standard for linear models like 
-    `Ridge`, `Lasso`, or `LinearRegression` in scikit-learn.
-    '''
-    df_coef = pd.DataFrame(model.coef_, index=model.feature_names_in_, columns=["coefs"])
-
-    fig, ax = plt.subplots(1, 2, figsize=figsize)
-    df_coef.plot(kind="barh", ax=ax[0], legend=False)
-    df_coef.abs().sort_values(by="coefs").plot(kind="barh", ax=ax[1], legend=False)
-    fig.suptitle(f"Model Coefficients - {str(model)}")
-
-    fig.tight_layout()
-
-    return df_coef
-
 # scipy.stats.mannwhitneyu()
 
 # scipy.stats.f_oneway()
