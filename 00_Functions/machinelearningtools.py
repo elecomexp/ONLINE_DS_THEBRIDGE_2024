@@ -1,57 +1,132 @@
 import re
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import seaborn as sns
 
-import scipy.stats
+from sklearn.metrics import roc_curve, auc
 
 def show_regression_coefs(model_reg):
     '''
-    Visualizes the coefficients of a fitted regression model.
+    Visualizes the coefficients of a fitted regression model, including binary and multiclass logistic regression models.
 
-    This function creates a horizontal bar plot of the regression model's coefficients.
-    It displays two subplots: one showing the original coefficients and the other
-    showing the absolute values of the coefficients sorted in ascending order. 
+    This function creates horizontal bar plots of the regression model's coefficients.
+    For multiclass models, it creates a subplot for each class showing the original coefficients,
+    and another subplot showing the absolute values of the coefficients sorted in ascending order. 
     Additionally, it returns a DataFrame containing the coefficients.
 
     Parameters
     ----------
-    model_reg : sklearn.base.RegressorMixin
+    model_reg : sklearn.base.ClassifierMixin or sklearn.base.RegressorMixin
         A fitted scikit-learn regression model. The model should have the attributes 
         `coef_` (the model's coefficients) and `feature_names_in_` (the names of the features).
-    
-    figsize : tuple, optional, default=(10, 5)
-        The size of the figure for the bar plots. It is passed to `matplotlib.pyplot.subplots`.
     
     Returns
     -------
     df_coef : pandas.DataFrame
-        A DataFrame containing the coefficients of the regression model. The index consists of the feature 
-        names and the single column is labeled "coefs".
+        A DataFrame containing the coefficients of the regression model. For multiclass models,
+        the DataFrame has one column per class. The index consists of the feature names.
     
     Example
     -------
-    >>> from sklearn.linear_model import Ridge
-    >>> model_ridge = Ridge().fit(X_train, y_train)
-    >>> show_coefs(model_ridge)
+    >>> from sklearn.linear_model import LogisticRegression
+    >>> model_logreg = LogisticRegression(multi_class='multinomial').fit(X_train, y_train)
+    >>> show_regression_coefs(model_logreg)
     
     Notes
     -----
-    This function requires the regression model to have been trained on the dataset with the `coef_` 
-    and `feature_names_in_` attributes, which are standard for linear models like 
-    `Ridge`, `Lasso`, or `LinearRegression` in scikit-learn.
+    This function is designed to handle both binary and multiclass logistic regression models.
     '''
-    df_coef = pd.DataFrame(model_reg.coef_, index=model_reg.feature_names_in_, columns=["coefs"])
+    # Handle binary or multiclass coefficients
+    if model_reg.coef_.shape[0] > 1:  # Multiclass case
+        coef = model_reg.coef_.T  # Transpose to have features as rows, classes as columns
+        columns = [f"Class {i}" for i in range(coef.shape[1])]
+    else:  # Binary case
+        coef = model_reg.coef_.flatten()  # Flatten to 1D array
+        columns = ["coefs"]
 
-    fig, ax = plt.subplots(1, 2, figsize=(10, 5))
-    df_coef.plot(kind="barh", ax=ax[0], legend=False)
-    df_coef.abs().sort_values(by="coefs").plot(kind="barh", ax=ax[1], legend=False)
+    # Create DataFrame with coefficients
+    df_coef = pd.DataFrame(coef, index=model_reg.feature_names_in_, columns=columns)
+    
+    # Determine the number of columns for subplots
+    num_cols = len(columns)
+    
+    # Plotting the coefficients
+    fig, axs = plt.subplots(2, num_cols, figsize=(15, 10))
     fig.suptitle(f"Regression Model Coefficients - {str(model_reg)}")
 
+    # Ensure axs is a 2D array even if num_cols == 1
+    if num_cols == 1:
+        axs = axs.reshape(2, 1)
+
+    for i, col in enumerate(df_coef.columns):
+        df_coef[col].plot(kind="barh", ax=axs[0, i], legend=False, title=f"Original Coefs: {col}")
+        df_coef[col].abs().sort_values().plot(kind="barh", ax=axs[1, i], legend=False, title=f"Absolute Coefs: {col}")
+
     fig.tight_layout()
+    plt.show()
 
     return df_coef
+
+
+
+
+# def show_regression_coefs(model_reg):
+#     '''
+#     Visualizes the coefficients of a fitted regression model, including multiclase logistic regression models.
+
+#     This function creates horizontal bar plots of the regression model's coefficients.
+#     For multiclase models, it creates a subplot for each class showing the original coefficients,
+#     and another subplot showing the absolute values of the coefficients sorted in ascending order. 
+#     Additionally, it returns a DataFrame containing the coefficients.
+
+#     Parameters
+#     ----------
+#     model_reg : sklearn.base.ClassifierMixin or sklearn.base.RegressorMixin
+#         A fitted scikit-learn regression model. The model should have the attributes 
+#         `coef_` (the model's coefficients) and `feature_names_in_` (the names of the features).
+    
+#     Returns
+#     -------
+#     df_coef : pandas.DataFrame
+#         A DataFrame containing the coefficients of the regression model. For multiclase models,
+#         the DataFrame has one column per class. The index consists of the feature names.
+    
+#     Example
+#     -------
+#     >>> from sklearn.linear_model import LogisticRegression
+#     >>> model_logreg = LogisticRegression(multi_class='multinomial').fit(X_train, y_train)
+#     >>> show_regression_coefs(model_logreg)
+    
+#     Notes
+#     -----
+#     This function is designed to handle both binary and multiclase logistic regression models.
+#     '''
+#     # Handle binary or multiclass coefficients
+#     if len(model_reg.coef_.shape[0]) > 1:
+#         coef = model_reg.coef_.T  # Transpose to have features as rows, classes as columns
+#         columns = [f"Class {i}" for i in range(coef.shape[1])]
+#     else:
+#         coef = model_reg.coef_.flatten()
+#         columns = ["coefs"]
+
+#     # Create DataFrame with coefficients
+#     df_coef = pd.DataFrame(coef, index=model_reg.feature_names_in_, columns=columns)
+    
+#     # Plotting the coefficients
+#     fig, axs = plt.subplots(2, coef.shape[1], figsize=(15, 10))
+#     fig.suptitle(f"Regression Model Coefficients - {str(model_reg)}")
+
+#     for i, col in enumerate(df_coef.columns):
+#         df_coef[col].plot(kind="barh", ax=axs[0, i], legend=False, title=f"Original Coefs: {col}")
+#         df_coef[col].abs().sort_values().plot(kind="barh", ax=axs[1, i], legend=False, title=f"Absolute Coefs: {col}")
+
+#     fig.tight_layout()
+#     plt.show()
+
+#     return df_coef
+
 
 ## ###############
 ## S12, U02, Ejercicios workout tengo funciones interesantes
@@ -188,3 +263,56 @@ def plot_features_importance(model, X_train, y_train):
     plt.title('Feature Importance Standardized by Coefficient and Feature Std Dev')
     plt.grid(axis='x', linestyle='--', alpha=0.7)
     plt.show()
+
+
+
+##############################################
+# DEPRECATED        DEPRECATED      DEPRECATED
+##############################################
+
+def show_regression_coefs_OLD(model_reg):
+    '''
+    Visualizes the coefficients of a fitted regression model.
+
+    This function creates a horizontal bar plot of the regression model's coefficients.
+    It displays two subplots: one showing the original coefficients and the other
+    showing the absolute values of the coefficients sorted in ascending order. 
+    Additionally, it returns a DataFrame containing the coefficients.
+
+    Parameters
+    ----------
+    model_reg : sklearn.base.RegressorMixin
+        A fitted scikit-learn regression model. The model should have the attributes 
+        `coef_` (the model's coefficients) and `feature_names_in_` (the names of the features).
+    
+    figsize : tuple, optional, default=(10, 5)
+        The size of the figure for the bar plots. It is passed to `matplotlib.pyplot.subplots`.
+    
+    Returns
+    -------
+    df_coef : pandas.DataFrame
+        A DataFrame containing the coefficients of the regression model. The index consists of the feature 
+        names and the single column is labeled "coefs".
+    
+    Example
+    -------
+    >>> from sklearn.linear_model import Ridge
+    >>> model_ridge = Ridge().fit(X_train, y_train)
+    >>> show_coefs(model_ridge)
+    
+    Notes
+    -----
+    This function requires the regression model to have been trained on the dataset with the `coef_` 
+    and `feature_names_in_` attributes, which are standard for linear models like 
+    `Ridge`, `Lasso`, or `LinearRegression` in scikit-learn.
+    '''
+    df_coef = pd.DataFrame(model_reg.coef_, index=model_reg.feature_names_in_, columns=["coefs"])
+
+    fig, ax = plt.subplots(1, 2, figsize=(10, 5))
+    df_coef.plot(kind="barh", ax=ax[0], legend=False)
+    df_coef.abs().sort_values(by="coefs").plot(kind="barh", ax=ax[1], legend=False)
+    fig.suptitle(f"Regression Model Coefficients - {str(model_reg)}")
+
+    fig.tight_layout()
+
+    return df_coef
