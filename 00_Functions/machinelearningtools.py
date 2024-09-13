@@ -5,7 +5,41 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
+from sklearn.metrics import mean_absolute_error, mean_squared_error, mean_absolute_percentage_error
 from sklearn.metrics import roc_curve, auc
+
+def regression_report(model, X, y):
+    """
+    Generates and prints a regression performance report for a given model.
+
+    Parameters
+    ----------
+    model : object
+        The regression model that has been trained and implements a `predict` method.
+    X : array-like or pandas DataFrame, shape (n_samples, n_features)
+        The input data used for prediction. Each row represents a sample, and each column represents a feature.
+    y : array-like or pandas Series, shape (n_samples,)
+        The true target values corresponding to the input data.
+
+    Returns
+    -------
+    None
+        Prints the following performance metrics:
+        - MAE (Mean Absolute Error): Measures the average magnitude of the errors in predictions.
+        - MAPE (Mean Absolute Percentage Error): Measures the percentage error between the predicted and actual values.
+        - RMSE (Root Mean Squared Error): Provides an estimate of the standard deviation of the prediction errors.
+
+    Notes
+    -----
+    - MAE is more robust to outliers compared to RMSE.
+    - MAPE can be problematic if true values are close to zero, as it involves division by the true values.
+    - RMSE is sensitive to large errors, making it useful when large deviations are particularly undesirable.
+    """
+    y_pred = model.predict(X)
+    print("MAE:", mean_absolute_error(y, y_pred))
+    print("MAPE:", mean_absolute_percentage_error(y, y_pred))
+    print("RMSE:", np.sqrt(mean_squared_error(y, y_pred)))
+
 
 def show_regression_coefs(model_reg):
     '''
