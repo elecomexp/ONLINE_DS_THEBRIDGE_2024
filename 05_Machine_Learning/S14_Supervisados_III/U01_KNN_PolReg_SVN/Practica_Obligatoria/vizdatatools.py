@@ -97,7 +97,7 @@ def plot_multiple_categorical_distributions(df, categorical_columns, *, relative
     if num_columns == 1:
         fig, ax = plt.subplots(1, 1, figsize=(7, 5))
     else:
-        fig, axs = plt.subplots(num_rows, 2, figsize=(15, 5 * num_rows))
+        fig, axs = plt.subplots(num_rows, 2, figsize=(10, 3.5 * num_rows))
         axs = axs.flatten()     # Return a copy of the array collapsed into one dimension.
 
     for i, col in enumerate(categorical_columns):
@@ -576,6 +576,30 @@ def plot_histograms_by_categorical_numerical_relationship(df, cat_column, num_co
 
 
 def plot_histograms_grouped(df, cat_col, num_col, group_size = 3):
+    """
+    Plots grouped histograms for a numerical column based on unique categories from a categorical column.
+
+    This function takes a dataframe and plots histograms of a specified numerical column (`num_col`) 
+    for unique categories within a categorical column (`cat_col`). The histograms are grouped, where 
+    each group contains a subset of categories, allowing for easier visualization if there are many 
+    unique categories.
+
+    Parameters:
+    -----------
+    df : pandas.DataFrame
+        The input dataframe containing the data to be plotted.
+    cat_col : str
+        The name of the categorical column used to group the data.
+    num_col : str
+        The name of the numerical column for which the histograms are plotted.
+    group_size : int, optional (default=3)
+        The number of unique categories to display per group of histograms.
+
+    Returns:
+    --------
+    None
+        Displays the histograms for each group of categories in a series of plots.
+    """
     unique_cats = df[cat_col].unique()
     num_cats = len(unique_cats)
 
@@ -583,7 +607,7 @@ def plot_histograms_grouped(df, cat_col, num_col, group_size = 3):
         subset_cats = unique_cats[i:i+group_size]
         subset_df = df[df[cat_col].isin(subset_cats)]
         
-        plt.figure(figsize=(10, 6))
+        plt.figure(figsize=(7, 4))
         for cat in subset_cats:
             sns.histplot(subset_df[subset_df[cat_col] == cat][num_col], kde=True, label=str(cat))
         
