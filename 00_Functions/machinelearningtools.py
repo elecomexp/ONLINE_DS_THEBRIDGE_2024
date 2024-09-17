@@ -5,8 +5,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from sklearn.metrics import mean_absolute_error, mean_squared_error, mean_absolute_percentage_error
-from sklearn.metrics import roc_curve, auc, classification_report
+from sklearn import metrics
 from sklearn.model_selection import cross_val_score
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -86,37 +85,46 @@ def find_best_k(X_train, y_train, k_range=20):
 
 
 
-def regression_report(model, X, y):
+def regression_report(model, X_true, y_true):
     """
-    Generates and prints a regression performance report for a given model.
+    Generates and prints a comprehensive regression performance report for a given model.
 
     Parameters
     ----------
     model : object
-        The regression model that has been trained and implements a `predict` method.
-    X : array-like or pandas DataFrame, shape (n_samples, n_features)
-        The input data used for prediction. Each row represents a sample, and each column represents a feature.
-    y : array-like or pandas Series, shape (n_samples,)
+        A trained regression model (fitted with .fit()) that has a `predict` method.
+    X_true : array-like or pandas DataFrame, shape (n_samples, n_features)
+        The input data used for predictions, where each row is a sample and each column is a feature.
+    y_true : array-like or pandas Series, shape (n_samples,)
         The true target values corresponding to the input data.
 
     Returns
     -------
     None
         Prints the following performance metrics:
-        - MAE (Mean Absolute Error): Measures the average magnitude of the errors in predictions.
-        - MAPE (Mean Absolute Percentage Error): Measures the percentage error between the predicted and actual values.
-        - RMSE (Root Mean Squared Error): Provides an estimate of the standard deviation of the prediction errors.
+        - MSE (Mean Squared Error): Measures the average squared difference between predicted and actual values.
+        - RMSE (Root Mean Squared Error): The square root of MSE, providing an estimate of the prediction error standard deviation.
+        - MAE (Mean Absolute Error): The average magnitude of the prediction errors.
+        - MAPE (Mean Absolute Percentage Error): The average percentage difference between predicted and true values.
+        - R² (Coefficient of Determination): A measure of how well the model explains the variance in the target variable.
 
     Notes
     -----
-    - MAE is more robust to outliers compared to RMSE.
-    - MAPE can be problematic if true values are close to zero, as it involves division by the true values.
-    - RMSE is sensitive to large errors, making it useful when large deviations are particularly undesirable.
+    - MAE is less sensitive to outliers than RMSE, making it more robust when large errors are not as important.
+    - MAPE may be unreliable when true values are close to zero, as it involves division by the true values.
+    - RMSE is more sensitive to large errors and is useful when large deviations are particularly undesirable.
+    - R² provides insight into how well the model fits the data, with a value of 1 indicating a perfect fit.
     """
-    y_pred = model.predict(X)
-    print("MAE:", mean_absolute_error(y, y_pred))
-    print("MAPE:", mean_absolute_percentage_error(y, y_pred))
-    print("RMSE:", np.sqrt(mean_squared_error(y, y_pred)))
+    y_pred = model.predict(X_true)
+    args = (y_true, y_pred)
+    
+    print('MSE train', metrics.mean_squared_error(*args))
+    print('RMSE train', metrics.root_mean_squared_error(*args))
+    print('MAE train:', metrics.mean_absolute_error(*args))
+    print('MAPE train:', metrics.mean_absolute_percentage_error(*args))
+    print('R2 train', model.score(X_true, y_true))
+    
+    return
 
 
 def show_regression_coefs(model_reg):
