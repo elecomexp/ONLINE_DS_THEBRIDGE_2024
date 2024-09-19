@@ -10,6 +10,177 @@ from sklearn.model_selection import cross_val_score
 from sklearn.neighbors import KNeighborsClassifier
 
 
+def remove_highly_correlated_features(train_set, num_features, threshold=0.7, visualize='none', verbose=False):
+    """
+    Removes numerical features that are highly correlated with each other based on a specified threshold.
+
+    Parameters:
+    -----------
+    train_set : pd.DataFrame
+        DataFrame containing the numerical features.
+    num_features : list
+        List of numerical feature column names to evaluate.
+    threshold : float, optional
+        Threshold for collinearity between features. If the absolute correlation is greater than or equal
+        to this value, one of the features will be excluded. Default is 0.7.
+    visualize : str, optional
+        Defines how the correlation matrix between features will be visualized ('heatmap', 'dataframe', 'both', 'none').
+        Default is 'none'.
+    verbose : bool, optional
+        If True, prints detailed messages during the process. Default is False.
+
+    Returns:
+    --------
+    list
+        List of remaining features after excluding highly collinear ones.
+    """
+    
+    # Compute correlation matrix for numerical features
+    corr_matrix = train_set[num_features].corr().abs()
+    
+    # Visualization of the correlation matrix
+    if visualize in ['heatmap', 'both']:
+        plt.figure(figsize=(10, 8))
+        sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', fmt='.2f', linewidths=0.5)
+        plt.title("Feature Correlation Matrix (Heatmap)")
+        plt.show()
+    
+    if visualize in ['dataframe', 'both']:
+        print("Feature Correlation Matrix (DataFrame):")
+        display(corr_matrix)
+    
+    # List to hold the features to be removed
+    excluded_features = set()
+    
+    # Iterate over the correlation matrix
+    for i in range(len(corr_matrix.columns)):
+        for j in range(i+1, len(corr_matrix.columns)):
+            feature_1 = corr_matrix.columns[i]
+            feature_2 = corr_matrix.columns[j]
+            corr_value = corr_matrix.iloc[i, j]
+            
+            # If correlation exceeds the threshold, mark one of the features for removal
+            if corr_value >= threshold:
+                if verbose:
+                    print(f"Correlation between {feature_1} and {feature_2} is {corr_value}. Excluding {feature_2}.")
+                excluded_features.add(feature_2)
+    
+    # Create the list of remaining features after exclusion
+    remaining_features = [feature for feature in num_features if feature not in excluded_features]
+    
+    if verbose:
+        print("Excluded features:", excluded_features)
+        print("Remaining features:", remaining_features)
+    
+    return remaining_features
+
+
+
+def get_target_correlated_features(train_set, num_features, target, target_threshold=0.1, collinearity_threshold=0.7, visualize='none', verbose=False):
+    """
+    Detects collinearity between numerical features and the target, and excludes highly collinear features.
+    The correlation matrix shown in the heatmap and DataFrame includes the target as the first row/column.
+    
+    Parameters:
+    -----------
+    train_set : pd.DataFrame
+        DataFrame containing the numerical features and the target.
+    num_features : list
+        List of numerical feature column names to evaluate.
+    target : str
+        Name of the target column.
+    target_threshold : float, optional
+        Threshold for selecting features that correlate with the target. Default is 0.1.
+    collinearity_threshold : float, optional
+        Threshold for collinearity between features. If the absolute correlation is greater than or equal
+        to this value, one of the features will be excluded. Default is 0.7.
+    visualize : str, optional
+        Defines how the correlation matrix between features will be visualized ('heatmap', 'dataframe', 'both', 'none').
+        Default is 'none'.
+    verbose : bool, optional
+        If True, prints detailed messages during the process. Default is False.
+
+    Returns:
+    --------
+    list
+        List of columns that have been excluded due to high collinearity.
+    list
+        List of remaining columns after exclusion.
+    """
+    
+    # Add the target to the list of features for correlation matrix computation
+    all_features = [target] + num_features
+    
+    # Compute correlation matrix including the target
+    corr_matrix = train_set[all_features].corr()
+    
+    # Filter features based on their correlation with the target
+    target_correlations = corr_matrix[target].abs().drop(target)
+    selected_features = target_correlations[target_correlations >= target_threshold].index.tolist()
+    
+    if verbose:
+        print(f"Features selected by correlation with target (threshold={target_threshold}): {selected_features}")
+    
+    # Add target back to the selected features list
+    selected_features = [target] + selected_features
+    
+    # Generate the correlation matrix for the selected features including the target
+    filtered_corr_matrix = corr_matrix.loc[selected_features, selected_features]
+    
+    # Visualization of the correlation matrix
+    if visualize in ['heatmap', 'both']:
+        plt.figure(figsize=(10, 8))
+        sns.heatmap(filtered_corr_matrix, annot=True, cmap='coolwarm', fmt='.2f', linewidths=0.5)
+        plt.title("Correlation Matrix (Heatmap)")
+        plt.show()
+    
+    if visualize in ['dataframe', 'both']:
+        print("Correlation Matrix (DataFrame):")
+        display(filtered_corr_matrix)
+    
+    # Initialize list of excluded features
+    excluded_features = []
+    
+    # Check collinearity among selected features (excluding the target)
+    for col in selected_features[1:]:
+        if verbose:
+            print(f"Checking collinearity with {col}")
+        # Check if the column has already been excluded
+        if col not in excluded_features:
+            for col_2, corr_value in filtered_corr_matrix[col].items():
+                if verbose:
+                    print(f"\t{col_2}:", end=' ')
+                # Ensure it's not the same column and that col_2 is in the selected features (excluding the target)
+                if col != col_2 and col_2 in selected_features[1:]:
+                    # If the absolute correlation exceeds the threshold, exclude col_2
+                    if np.abs(corr_value) >= collinearity_threshold:
+                        if verbose:
+                            print(f"\tCorrelation is {round(corr_value, 2)}, excluding {col_2}.")
+                        excluded_features.append(col_2)
+                    else:
+                        if verbose:
+                            print(f"\tCorrelation is below the threshold. Keeping {col_2}.")
+                elif col == col_2:
+                    if verbose:
+                        print("\tThis is the same feature. Not excluding.")
+                else:
+                    if verbose:
+                        print("\tNot in the original feature list. Doing nothing.")
+    
+    # Remove duplicates from the excluded features list
+    excluded_features = list(set(excluded_features))
+    
+    # Create a reduced set of features excluding the collinear ones
+    reduced_features = [col for col in selected_features[1:] if col not in excluded_features]
+    
+    if verbose:
+        print("Excluded features: ", excluded_features)
+        print("Reduced set of features:", reduced_features)
+    
+    return excluded_features, reduced_features
+
+
+
 def plot_predictions_vs_actual(y_real, y_pred):
     """
     Plot the predicted values against the actual values for regression tasks.
