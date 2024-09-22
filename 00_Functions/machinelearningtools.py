@@ -10,6 +10,17 @@ from sklearn.model_selection import cross_val_score
 from sklearn.neighbors import KNeighborsClassifier
 
 
+def safe_log(column):
+    """
+    Aplicar el logaritmo de manera segura, para evitar hacer log(0) o de números negativos.
+    """
+    # Desplazar los valores si hay alguno <= 0
+    min_val = column.min()
+    if min_val <= 0:
+        column = column - min_val + 1
+    return np.log(column)
+
+
 def remove_highly_correlated_features(train_set, num_features, threshold=0.7, visualize='none', verbose=False):
     """
     Removes numerical features that are highly correlated with each other based on a specified threshold.
