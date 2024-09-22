@@ -432,7 +432,7 @@ def plot_absolute_categorical_relationship_and_contingency_table(df, col1, col2)
 ##############################################
 '''
 
-def plot_categorical_numerical_relationship(df, categorical_col, numerical_col, show_values = True, measure = 'mean'):
+def plot_categorical_numerical_relationship(df, categorical_col, numerical_col, show_values=True, measure='mean', group_size=5):
     # Calcula la medida de tendencia central (mean o median)
     if measure == 'median':
         grouped_data = df.groupby(categorical_col)[numerical_col].median()
@@ -443,14 +443,14 @@ def plot_categorical_numerical_relationship(df, categorical_col, numerical_col, 
     # Ordena los valores
     grouped_data = grouped_data.sort_values(ascending=False)
 
-    # Si hay más de 5 categorías, las divide en grupos de 5
-    if grouped_data.shape[0] > 5:
+    # Si hay más de group_size categorías, las divide en grupos de group_size
+    if grouped_data.shape[0] > group_size:
         unique_categories = grouped_data.index.unique()
-        num_plots = int(np.ceil(len(unique_categories) / 5))
+        num_plots = int(np.ceil(len(unique_categories) / group_size))
 
         for i in range(num_plots):
             # Selecciona un subconjunto de categorías para cada gráfico
-            categories_subset = unique_categories[i * 5:(i + 1) * 5]
+            categories_subset = unique_categories[i * group_size:(i + 1) * group_size]
             data_subset = grouped_data.loc[categories_subset]
 
             # Crea el gráfico
@@ -473,7 +473,7 @@ def plot_categorical_numerical_relationship(df, categorical_col, numerical_col, 
             # Muestra el gráfico
             plt.show()
     else:
-        # Crea el gráfico para menos de 5 categorías
+        # Crea el gráfico para menos de group_size categorías
         plt.figure(figsize=(10, 6))
         ax = sns.barplot(x=grouped_data.index, y=grouped_data.values)
 
