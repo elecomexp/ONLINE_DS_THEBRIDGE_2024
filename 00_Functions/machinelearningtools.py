@@ -14,6 +14,90 @@ from sklearn.neighbors import KNeighborsClassifier
 from matplotlib.ticker import FixedLocator, FixedFormatter
 
 
+
+def plot_clustering(algorithm, X, size=100, show_xlabels=True, show_ylabels=True):
+    """
+    Plots the results of a clustering algorithm on a 2D dataset. It distinguishes between core points, 
+    non-core points, and anomalies (noise) based on the clustering algorithm's output.
+    
+    Parameters
+    ----------
+    algorithm : sklearn.base.ClusterMixin
+        The clustering model after fitting, such as DBSCAN or other clustering algorithms.
+        Must have `labels_`, `core_sample_indices_`, and `components_` attributes, which are typical for DBSCAN.
+    
+    X : array-like, shape (n_samples, n_features)
+        The original dataset used to fit the clustering model. Should contain at least two features for 2D plotting.
+    
+    size : int, optional, default=100
+        Size of the scatter plot points representing core samples.
+    
+    show_xlabels : bool, optional, default=True
+        Whether to show x-axis labels (True) or hide them (False).
+    
+    show_ylabels : bool, optional, default=True
+        Whether to show y-axis labels (True) or hide them (False).
+
+    Returns
+    -------
+    None
+        Displays a scatter plot showing the clustering result. Core samples, non-core samples, and anomalies 
+        (if present) are represented with different markers and colors.
+    
+    Notes
+    -----
+    - Core points (in clustering like DBSCAN) are plotted with larger circle markers (`o`), and non-core points 
+      are plotted with smaller markers.
+    - Anomalies (points labeled as noise, typically marked by label `-1` in DBSCAN) are highlighted in red with 'x' markers.
+    
+    Example
+    -------
+    dbscan = DBSCAN(eps=0.3, min_samples=10).fit(X)
+    plot_clustering(dbscan, X, size=150)
+    """
+    # Determine masks for core points, non-core points, and anomalies
+    core_mask = np.zeros_like(algorithm.labels_, dtype=bool)
+    core_mask[algorithm.core_sample_indices_] = True
+    anomalies_mask = algorithm.labels_ == -1
+    non_core_mask = ~(core_mask | anomalies_mask)
+
+    # Extract core points, anomalies, and non-core points
+    cores = algorithm.components_
+    anomalies = X[anomalies_mask]
+    non_cores = X[non_core_mask]
+    
+    # Plot core points with clustering labels
+    plt.scatter(cores[:, 0], cores[:, 1],
+                c=algorithm.labels_[core_mask], marker='o', s=size, cmap="Paired")
+    
+    # Plot core points with star markers on top
+    plt.scatter(cores[:, 0], cores[:, 1], marker='*', s=20, c=algorithm.labels_[core_mask])
+    
+    # Plot anomalies (noise) with red 'x' markers
+    plt.scatter(anomalies[:, 0], anomalies[:, 1], c="r", marker="x", s=100)
+    
+    # Plot non-core points with small markers
+    plt.scatter(non_cores[:, 0], non_cores[:, 1], c=algorithm.labels_[non_core_mask], marker=".")
+    
+    # Set axis labels
+    if show_xlabels:
+        plt.xlabel("$x_1$", fontsize=14)
+    else:
+        plt.tick_params(labelbottom=False)
+    
+    if show_ylabels:
+        plt.ylabel("$x_2$", fontsize=14, rotation=0)
+    else:
+        plt.tick_params(labelleft=False)
+    
+    # Set plot title with clustering parameters if available
+    if hasattr(algorithm, 'eps') and hasattr(algorithm, 'min_samples'):
+        plt.title("eps={:.2f}, min_samples={}".format(algorithm.eps, algorithm.min_samples), fontsize=14)
+    
+    plt.show()
+
+
+
 def plot_silhouette_kmeans(X, ks=(2, 3, 4, 5)):
     """
     Plots silhouette analysis for different KMeans clustering configurations.
