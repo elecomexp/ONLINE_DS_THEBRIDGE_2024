@@ -1,1 +1,6 @@
-Eliminar "Product" del train porque casi podría ser un target
+Separar en train y validation
+
+Desglosar en más columnas las featurs categoricas:
+
+    Cpu --> No lo ha hecho muy bien
+    Gpu
