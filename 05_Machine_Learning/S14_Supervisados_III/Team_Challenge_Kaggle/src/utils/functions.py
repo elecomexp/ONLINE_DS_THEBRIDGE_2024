@@ -7,32 +7,31 @@ import urllib.request
 from PIL import Image
 
 
-# Suponiendo que df_train_mod es tu DataFrame
-def extract_cpu_features(cpu):
-    # Inicializar valores
-    brand = None
-    family = None
-    cores = None
-    frequency = None
-    
-    # Extraer la marca
-    if 'Intel' in cpu:
-        brand = 'Intel'
-    elif 'AMD' in cpu:
-        brand = 'AMD'
-    
-    # Extraer la familia (i3, i5, i7, etc.)
-    match = re.search(r'(i[357])|AMD (A[6-9]|FX|A10|A12)', cpu)
-    if match:
-        family = match.group(0)
-    
-    # Extraer la frecuencia
-    match = re.search(r'(\d+\.\d+|\d+)GHz', cpu)
-    if match:
-        frequency = float(match.group(1))
-    
-    return pd.Series([brand, family, cores, frequency])
+def extract_gpu_features(gpu):
+    """
+    Desglosa la columna "Gpu" en nuevas características que representan la marca, 
+    y modelo de la tarjeta gráfica   
+    """
+    parts = gpu.split()
+    is_amd = 1 if parts[0] == 'AMD' else 0
+    is_intel = 1 if parts[0] == 'Intel' else 0
+    model = ' '.join(parts[1:])
 
+    return pd.Series([is_amd, is_intel, model], index=['Gpu_isAMD', 'Gpu_isIntel', 'Gpu_Model'])
+
+
+def extract_cpu_features(cpu):
+    """
+    Desglosa la columna "Cpu" en nuevas características que representan la marca, 
+    sere, modelo y frecuencia (GHz) del procesador.
+    """
+    parts = cpu.split()
+    brand = 1 if parts[0].lower() == 'amd' else 0
+    frequency = float(parts[-1].replace('GHz', ''))
+    series = ' '.join(parts[1:-2])
+    model = parts[-2]
+    
+    return pd.Series([brand, series, model, frequency], index=['Cpu_isAMD', 'Cpu_Series', 'Cpu_Model', 'Cpu_GHz'])
 
 
 def extract_screen_features(screen_resolution):
@@ -67,24 +66,106 @@ def extract_screen_features(screen_resolution):
     
     return pd.Series([width, height, is_ips, is_retina, is_touchscreen])
 
-def extract_memory_by_type(storage, storage_type):
+
+
+def extract_memory_features(storage):
     """
-    Función para extraer la capacidad en GB por tipo de almacenamiento
+    Función para extraer la capacidad en GB para cada tipo de almacenamiento.
+    Devuelve un DataFrame con las capacidades en GB para HDD, SSD, Flash Storage y Hybrid,
+    además de la columna Memory_Type con el tipo de almacenamiento y Memory_GB con la capacidad total.
     """
-    capacity = 0
+    # Inicializar un diccionario para almacenar las capacidades
+    capacity_dict = {'HDD_GB': 0, 'SSD_GB': 0, 'Flash_Storage_GB': 0, 'Hybrid_GB': 0}
+    
+    # Inicializar una lista para almacenar los tipos de memoria detectados
+    memory_types = set()
+
     for part in storage.split('+'):
         part = part.strip()
-        if storage_type in part:
-            # Buscar si tiene capacidad en GB o TB usando regex
-            gb_match = re.search(r'(\d+)\s*GB', part)
-            tb_match = re.search(r'(\d+(\.\d+)?)\s*TB', part)
-            
-            if gb_match:
-                capacity += int(gb_match.group(1))  # Extraer valor en GB
-            elif tb_match:
-                capacity += int(float(tb_match.group(1)) * 1000)  # Convertir TB a GB
-    return capacity
+        
+        # Verificar y sumar capacidades para cada tipo de almacenamiento
+        for storage_type in capacity_dict.keys():
+            if storage_type.replace('_GB', '').replace('_', ' ') in part:
+                # Añadir tipo de almacenamiento a la lista
+                memory_types.add(storage_type.replace('_GB', ''))
+                
+                gb_match = re.search(r'(\d+)\s*GB', part)
+                tb_match = re.search(r'(\d+(\.\d+)?)\s*TB', part)
 
+                if gb_match:
+                    capacity_dict[storage_type] += int(gb_match.group(1))  # Extraer valor en GB
+                elif tb_match:
+                    capacity_dict[storage_type] += int(float(tb_match.group(1)) * 1000)  # Convertir TB a GB
+
+    # Sumar las capacidades totales para Memory_GB
+    total_memory_gb = sum(capacity_dict.values())
+    
+    # Crear la columna Memory_Type como una combinación de tipos detectados
+    capacity_dict['Memory_Type'] = ', '.join(memory_types) if memory_types else 'None'
+    capacity_dict['Memory_GB'] = total_memory_gb  # Añadir la capacidad total a capacity_dict
+    
+    return pd.Series(capacity_dict)
+
+
+
+
+# def extract_memory_features(storage):
+#     """
+#     Función para extraer la capacidad en GB para cada tipo de almacenamiento.
+#     Devuelve un DataFrame con las capacidades en GB para HDD, SSD, Flash Storage y Hybrid,
+#     además de la columna Memory_Type con el tipo de almacenamiento.
+#     """
+#     # Inicializar un diccionario para almacenar las capacidades
+#     capacity_dict = {'HDD_GB': 0, 'SSD_GB': 0, 'Flash_Storage_GB': 0, 'Hybrid_GB': 0}
+    
+#     # Inicializar una lista para almacenar los tipos de memoria detectados
+#     memory_types = set()
+
+#     for part in storage.split('+'):
+#         part = part.strip()
+        
+#         # Verificar y sumar capacidades para cada tipo de almacenamiento
+#         for storage_type in capacity_dict.keys():
+#             if storage_type.replace('_GB', '').replace('_', ' ') in part:
+#                 # Añadir tipo de almacenamiento a la lista
+#                 memory_types.add(storage_type.replace('_GB', ''))
+                
+#                 gb_match = re.search(r'(\d+)\s*GB', part)
+#                 tb_match = re.search(r'(\d+(\.\d+)?)\s*TB', part)
+
+#                 if gb_match:
+#                     capacity_dict[storage_type] += int(gb_match.group(1))  # Extraer valor en GB
+#                 elif tb_match:
+#                     capacity_dict[storage_type] += int(float(tb_match.group(1)) * 1000)  # Convertir TB a GB
+
+#     # Crear la columna Memory_Type como una combinación de tipos detectados
+#     capacity_dict['Memory_Type'] = ', '.join(memory_types) if memory_types else 'None'
+    
+#     return pd.Series(capacity_dict)
+
+
+# def extract_memory_by_type(storage):
+#     """
+#     Función para extraer la capacidad en GB para cada tipo de almacenamiento.
+#     Devuelve un DataFrame con las capacidades en GB para HDD, SSD, Flash Storage y Hybrid.
+#     """
+#     # Inicializar un diccionario para almacenar las capacidades
+#     capacity_dict = {'HDD_GB': 0, 'SSD_GB': 0, 'Flash_Storage_GB': 0, 'Hybrid_GB': 0}
+    
+#     for part in storage.split('+'):
+#         part = part.strip()
+#         # Verificar y sumar capacidades para cada tipo de almacenamiento
+#         for storage_type in capacity_dict.keys():
+#             if storage_type.replace('_GB', '').replace('_', ' ') in part:
+#                 gb_match = re.search(r'(\d+)\s*GB', part)
+#                 tb_match = re.search(r'(\d+(\.\d+)?)\s*TB', part)
+
+#                 if gb_match:
+#                     capacity_dict[storage_type] += int(gb_match.group(1))  # Extraer valor en GB
+#                 elif tb_match:
+#                     capacity_dict[storage_type] += int(float(tb_match.group(1)) * 1000)  # Convertir TB a GB
+
+#     return pd.Series(capacity_dict)
 
 
 def kaggle_checker(df_to_submit, path, sample=pd.read_csv(r'./data/sample_submission.csv')):

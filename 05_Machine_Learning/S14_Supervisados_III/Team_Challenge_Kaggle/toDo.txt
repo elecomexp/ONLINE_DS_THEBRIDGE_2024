@@ -1,6 +1,14 @@
-Separar en train y validation
 
 Desglosar en más columnas las featurs categoricas:
 
-    Cpu --> No lo ha hecho muy bien
-    Gpu
+Variable sque no influyen demasiado en el precio:
+Inches
+Parece que no importa tanto la capacidad sino si HDD SSD o flash
+Anchura y altura de la pantalla tampoco  importa mucho
+Los GB de la CPU no impottan mucho
+GPU Nvidia es importante
+
+
+hacer un analisis del peso de las variables
+
+Probar con robustscaler pero sin elimninar outliers
