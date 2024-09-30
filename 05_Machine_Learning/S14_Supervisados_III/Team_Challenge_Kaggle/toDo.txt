@@ -12,3 +12,5 @@ GPU Nvidia es importante
 hacer un analisis del peso de las variables
 
 Probar con robustscaler pero sin elimninar outliers
+
+Optimizar los hiperparámetros para el train + val
