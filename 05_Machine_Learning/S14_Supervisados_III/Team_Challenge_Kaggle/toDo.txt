@@ -1,16 +1,5 @@
-
-Desglosar en más columnas las featurs categoricas:
-
-Variable sque no influyen demasiado en el precio:
-Inches
-Parece que no importa tanto la capacidad sino si HDD SSD o flash
-Anchura y altura de la pantalla tampoco  importa mucho
-Los GB de la CPU no impottan mucho
-GPU Nvidia es importante
-
-
-hacer un analisis del peso de las variables
+Hacer un analisis del peso de las variables
 
 Probar con robustscaler pero sin elimninar outliers
 
-Optimizar los hiperparámetros para el train + val
+Probar catboost con target encoded
