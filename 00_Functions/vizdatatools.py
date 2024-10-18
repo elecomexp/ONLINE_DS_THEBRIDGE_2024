@@ -69,7 +69,7 @@ import squarify
 '''
 
 
-def plot_multiple_categorical_distributions(df, categorical_columns, *, relative = False, show_values = True, rotation = 45, palette = 'viridis') -> None:
+def plot_multiple_categorical_distributions(df, categorical_columns, *, relative=False, show_values=True, rotation=45, palette='viridis') -> None:
     '''
     Plot a bar-graphs matrix, with 2 columns and the rows needed to plot the
     `absolute` or `relative` frequency from the categorical columns of `df`.
