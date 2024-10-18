@@ -44,7 +44,8 @@ def remove_non_zip_folders(base_path):
 
     Parameters
     ----------
-        base_path (str): The root directory to start the search from.
+    base_path (str)
+        The root directory to start the search from.
 
     Example
     -------
@@ -58,12 +59,13 @@ def remove_non_zip_folders(base_path):
         └── folder3/
             └── image.png
 
-        Calling remove_non_zip_folders(base_directory) will remove 'folder1' and 'folder3',
-        but will keep 'folder2' because it contains a .zip file.
+    Calling remove_non_zip_folders(base_directory) will remove 'folder1' and 'folder3',
+    but will keep 'folder2' because it contains a .zip file.
     
-    Usage:
-        base_directory = "path_to_your_folder/data"
-        remove_non_zip_folders(base_directory)
+    Usage
+    -----
+    >>> base_directory = 'path_to_your_folder/data'
+    >>> remove_non_zip_folders(base_directory)
     """
     # Recursively walk through all folders and subfolders
     for root, dirs, files in os.walk(base_path, topdown=False):
