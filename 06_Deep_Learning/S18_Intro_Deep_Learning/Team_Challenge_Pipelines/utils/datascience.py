@@ -1,12 +1,28 @@
-import re
+"""
+datascience.py
+
+Author: Lander Combarro Exposito
+Created: 2024/10/23
+Last Modified: 2024/10/23
+
+Description
+-----------
+This module contains functions for data analysis and machine learning model processing.
+
+Functions
+---------
+>>> get_cardinality()
+>>> regression_report()
+"""
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import seaborn as sns
 
-import scipy.stats
+from sklearn import metrics
 
-def get_cardinality(df: pd.DataFrame, threshold_categorical=10, threshold_continuous=30):
+def get_cardinality(df:pd.DataFrame, threshold_categorical=10, threshold_continuous=30):
     '''
     Calculates and returns cardinality statistics for each column in a pandas DataFrame, 
     classifying the columns based on their cardinality.
@@ -50,108 +66,44 @@ def get_cardinality(df: pd.DataFrame, threshold_categorical=10, threshold_contin
     return df_out
 
 
-
-def coeficiente_variación(df):
-    '''
-    Devuelve un pandas.DataFrame con la media, la desviación estándar (ro), 
-    en las mismas unidades que la media y su coeficiente de variación (CV)
-    '''
-    df_var = df.describe().loc[['std', 'mean']].T
-    df_var['CV'] = df_var['std'] / df_var['mean']
-    return df_var
-
-
-def split_by_uppercase(text) -> str:
-    '''
-    Uses regular expressions to find uppercase letters, split a string at those points,
-    and return a new string separated by spaces.
-    
-    Parameters:
-    ----------
-    text : str
-        Text to split.
-        
-    Returns:
-    -------
-    str
-        The modified string with spaces inserted before each uppercase letter.
-    '''
-    strings = re.findall(r'[A-Z][^A-Z]*', text)
-    return ' '.join(strings)
-
-
-# scipy.stats.mannwhitneyu()
-
-# scipy.stats.f_oneway()
-
-def mapa_calor(corr_matrix):
-    '''
-    Hay que introducir una matriz de correlación generada con pandas
-    '''
-    plt.figure(figsize=(10, 8))  # Ya lo veremos pero esto permite ajustar el tamaño de las gráficas
-    sns.heatmap(corr_matrix, annot=True, fmt=".2f", cmap="coolwarm", 
-                cbar=True, square=True, linewidths=.5) # el cmap es el rango de colores usado para representar "el calor"
-
-    plt.title('Matriz de Correlación')
-    plt.xticks(rotation=45)  # Rota las etiquetas de las x si es necesario
-    plt.yticks(rotation=45)  # Rota las etiquetas de las y si es necesario
-
-    plt.show()
-    
-    
-
-
-
-
-
-
-
-
-###########################################################################################
-###     DEPRECATED      DEPRECATED      DEPRECATED      DEPRECATED      DEPRECATED      ###
-###########################################################################################
-
-
-def get_cardinality_class(df_in, threshold_categorical = 10, threshold_continuous = 30):
-    '''
-    Categorizes each column of `df_in` in a pandas.DataFrame based on its cardinality.
+def regression_report(model, X_true, y_true):
+    """
+    Generates and prints a comprehensive regression performance report for a given model.
 
     Parameters
     ----------
-    df_in : pandas.DataFrame
-        The input DataFrame containing the data to be analyzed.
-        
-    threshold_categorical : int, optional
-        The threshold for determining categorical variables. Columns with unique values 
-        less than this threshold are considered categorical. Default is 10.
-        
-    threshold_continuous : int, optional
-        The threshold percentage for determining continuous numerical variables. Columns with a 
-        cardinality percentage higher than this threshold are considered continuous numerical. Default is 30.
+    model : object
+        A trained regression model (fitted with .fit()) that has a `predict` method.
+    X_true : array-like or pandas DataFrame, shape (n_samples, n_features)
+        The input data used for predictions, where each row is a sample and each column is a feature.
+    y_true : array-like or pandas Series, shape (n_samples,)
+        The true target values corresponding to the input data.
 
     Returns
     -------
-    pandas.DataFrame with columns:
-        - 'Card': The cardinality of each column.
-        - '%_Card': The percentage cardinality of each column relative to the total number of rows.
-        - 'Tipo': The data type of each column.
-        - 'Clase': The assigned variable class for each column based on the specified thresholds.
+    None
+        Prints the following performance metrics:
+        - MSE (Mean Squared Error): Measures the average squared difference between predicted and actual values.
+        - RMSE (Root Mean Squared Error): The square root of MSE, providing an estimate of the prediction error standard deviation.
+        - MAE (Mean Absolute Error): The average magnitude of the prediction errors.
+        - MAPE (Mean Absolute Percentage Error): The average percentage difference between predicted and true values.
+        - R² (Coefficient of Determination): A measure of how well the model explains the variance in the target variable.
 
     Notes
     -----
-    The function assigns variable classes as follows:
-        - 'Categoric' for columns with cardinality less than `threshold_categorical`.
-        - 'Binary' for columns with exactly 2 unique values.
-        - 'Numeric - Discrete' for columns with cardinality greater than or equal to `threshold_categorical`.
-        - 'Numeric - Continuous' for columns with a cardinality percentage greater than `threshold_continuous`.
-    '''
-    df_out = pd.DataFrame([df_in.nunique(), df_in.nunique()/len(df_in) * 100, df_in.dtypes])
-    df_out = df_out.T.rename(columns = {0: "Card", 1: "%_Card", 2: "Tipo"})
+    - MAE is less sensitive to outliers than RMSE, making it more robust when large errors are not as important.
+    - MAPE may be unreliable when true values are close to zero, as it involves division by the true values.
+    - RMSE is more sensitive to large errors and is useful when large deviations are particularly undesirable.
+    - R² provides insight into how well the model fits the data, with a value of 1 indicating a perfect fit.
+    """
+    y_pred = model.predict(X_true)
+    args = (y_true, y_pred)
     
-
-    df_out.loc[df_out["Card"] < threshold_categorical, "Clase"] = "Categoric"    
-    df_out.loc[df_out["Card"] == 2, "Clase"] = "Binary"
-    df_out.loc[df_out["Card"] >= threshold_categorical, "Clase"] ="Numeric - Discrete"
-    df_out.loc[df_out["%_Card"] > threshold_continuous, "Clase"] = "Numeric - Continuous"
+    print('Regression Report:')
+    print('MSE:', metrics.mean_squared_error(*args))
+    print('RMSE:', metrics.root_mean_squared_error(*args))
+    print('MAE:', metrics.mean_absolute_error(*args))
+    print('MAPE:', metrics.mean_absolute_percentage_error(*args))
+    print('R2:', model.score(X_true, y_true))
     
-    return df_out
+    return
