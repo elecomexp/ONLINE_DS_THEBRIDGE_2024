@@ -87,7 +87,7 @@ def regression_report(model, X_true, y_true):
         - RMSE (Root Mean Squared Error): The square root of MSE, providing an estimate of the prediction error standard deviation.
         - MAE (Mean Absolute Error): The average magnitude of the prediction errors.
         - MAPE (Mean Absolute Percentage Error): The average percentage difference between predicted and true values.
-        - R² (Coefficient of Determination): A measure of how well the model explains the variance in the target variable.
+        - R2 (Coefficient of Determination): A measure of how well the model explains the variance in the target variable.
 
     Notes
     -----
