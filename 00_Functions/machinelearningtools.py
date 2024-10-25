@@ -1,6 +1,7 @@
 import re
 
 import matplotlib as mpl
+import matplotlib.cm
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
