@@ -14,14 +14,18 @@ Functions
 ---------
 >>> plot_multiple_categorical_distributions()
 >>> plot_multiple_histograms_KDEs_boxplots()
->>> plot_categorical_numerical_relationship()                           
+>>> plot_categorical_numerical_relationship()     
+>>> plot_silhouette_kmeans()                      
 """
-
+import matplotlib.cm
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
 
+from matplotlib.ticker import FixedFormatter, FixedLocator
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_samples, silhouette_score
 
 '''
 ################################################################################################### 
@@ -225,3 +229,79 @@ def plot_categorical_numerical_relationship(df, categorical_col, numerical_col, 
         # Muestra el gráfico
         plt.grid()
         plt.show()
+
+
+'''
+###################################################################################################
+#             K-Means                         K-Means                          K-Means            #
+###################################################################################################
+'''
+
+def plot_silhouette_kmeans(X, ks=(2, 3, 4, 5)):
+    """
+    Plots silhouette analysis for different KMeans clustering configurations.
+    
+    Parameters
+    ----------
+    - X (array-like): Data used for clustering.
+    - ks (tuple or list): Values of k (number of clusters) to evaluate.
+    
+    Description
+    -----------
+    The width of each silhouette plot represents the number of samples per cluster. 
+    The samples are sorted by their silhouette coefficient, giving the shape of a "knife." 
+    Clusters with a large drop-off indicate more dispersed silhouette coefficients.
+    Ideally, all clusters should be above the average silhouette score.
+    Negative coefficients indicate points assigned to the wrong cluster.
+    
+    Returns
+    -------
+    A plot showing the silhouette analysis for different values of k.
+    """
+    n_ks = len(ks)
+    n_cols = 2
+    n_rows = (n_ks + 1) // n_cols  # Para asegurar que hay suficientes filas
+    
+    plt.figure(figsize=(12, 4 * n_rows))
+
+    for idx, k in enumerate(ks, 1):
+        plt.subplot(n_rows, n_cols, idx)
+        clustering = KMeans(n_clusters=k)
+        clustering.fit(X)
+        y_pred = clustering.labels_
+        
+        # Calculate silhouette score and silhouette coefficients
+        silhouette_avg = silhouette_score(X, y_pred)
+        silhouette_coefficients = silhouette_samples(X, y_pred)
+
+        padding = len(X) // 30
+        pos = padding
+        ticks = []
+        for i in range(k):
+            coeffs = silhouette_coefficients[y_pred == i]
+            coeffs.sort()
+
+            color = matplotlib.cm.Spectral(i / k)
+            plt.fill_betweenx(np.arange(pos, pos + len(coeffs)), 0, coeffs,
+                              facecolor=color, edgecolor=color, alpha=0.7)
+            ticks.append(pos + len(coeffs) // 2)
+            pos += len(coeffs) + padding
+
+        plt.gca().yaxis.set_major_locator(FixedLocator(ticks))
+        plt.gca().yaxis.set_major_formatter(FixedFormatter(range(k)))
+        
+        if idx % n_cols == 1:
+            plt.ylabel("Cluster")
+
+        if idx > n_ks - n_cols:
+            plt.gca().set_xticks([-0.1, 0, 0.2, 0.4, 0.6, 0.8, 1])
+            plt.xlabel("Silhouette Coefficient")
+        else:
+            plt.tick_params(labelbottom=True)
+
+        # Draw silhouette score average line
+        plt.axvline(x=silhouette_avg, color="red", linestyle="--")
+        plt.title(f"$k={k}$", fontsize=16)
+
+    plt.tight_layout()
+    plt.show()
