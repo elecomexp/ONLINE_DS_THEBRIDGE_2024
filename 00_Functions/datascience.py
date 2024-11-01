@@ -35,7 +35,7 @@ def get_cardinality(df: pd.DataFrame, threshold_categorical=10, threshold_contin
         - 'Type': The data type of each column.
         - 'Class': The classification of each column based on its cardinality.
     '''
-    print('pandas.DataFrame shape: ', df.shape)
+    print('pandas.DataFrame shape:', df.shape)
     
     df_out = pd.DataFrame([df.nunique(), df.nunique()/len(df) * 100, 
                            df.isna().sum(), df.isna().mean() * 100, df.dtypes])
