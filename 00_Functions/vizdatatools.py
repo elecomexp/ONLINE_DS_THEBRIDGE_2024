@@ -1,76 +1,77 @@
-'''
+"""
+vizdatatools.py
+
 Author: Lander Combarro Exposito
-Date: 2024-07-17
+Created: 2024/07/17
+Last Modified: 2024/11/18
 
-Module Functions:
+Description
+-----------
+Module for Data Visualization Utilities
 
-Análisis  univariante
----------------------
+This module provides a comprehensive set of visualization functions for univariate, 
+bivariate, and multivariate analysis, as well as deep learning image processing. 
+The functions cover a range of plot types including categorical, numerical, and 
+combinations of both, designed to support various types of data analysis.
 
-    plot_multiple_categorical_distributions
-    plot_multiple_histograms_KDEs_boxplots
-    violinplot_multiple
-    boxplot_multiple
-    lineplot_multiple
-
-Análisis bivariante
--------------------
-
-    Categórica - Categórica
-    
-        plot_categorical_relationship
-        plot_absolute_categorical_relationship_and_contingency_table
-
-    Categórica - Numérica
-    
-        plot_categorical_numerical_relationship
-        boxplots_grouped
-        plot_histograms_by_categorical_numerical_relationship
-        plot_histograms_grouped
-
-    Numérica - Numérica
-    
-        scatterplot_with_correlation
-
-Análisis multivariante
-----------------------
-
-    3 Categorical Variables
-    
-        plot_tricategorical_analysis
-
-    2 Numerical, 1 Categorical Variables
-    
-        bubleplot
-        scatterplot_3variables
-    
-    4 Variables
-        scatterplot
-
-Deep Learning Image Processing
-------------------------------
-
-    show_images_batch
-    
-'''
+Functions
+---------
+vizdatatools
+│
+├── univariate_analysis
+│   │
+│   ├── plot_multiple_categorical_distributions
+│   ├── plot_multiple_histograms_KDEs_boxplots
+│   ├── violinplot_multiple
+│   ├── boxplot_multiple
+│   └── lineplot_multiple
+│
+├── bivariate_analysis
+│   │
+│   ├── categorical_categorical
+│   │   ├── plot_categorical_relationship
+│   │   └── plot_absolute_categorical_relationship_and_contingency_table
+│   │
+│   ├── categorical_numerical
+│   │   ├── plot_categorical_numerical_relationship
+│   │   ├── boxplots_grouped
+│   │   ├── plot_histograms_by_categorical_numerical_relationship
+│   │   └── plot_histograms_grouped
+│   │
+│   └── numerical_numerical
+│       └── scatterplot_with_correlation
+│
+├── multivariate_analysis
+│   │
+│   ├── three_categorical_variables
+│   │   └── plot_tricategorical_analysis
+│   │
+│   ├── two_numerical_one_categorical
+│   │   ├── bubbleplot
+│   │   └── scatterplot_3_variables
+│   │
+│   └── four_variables
+│       └── scatterplot
+│
+└── deep_learning_image_processing
+    │
+    └── show_images_batch
+"""
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-import squarify
 
-'''
+"""
 ###################################################################################################
-#                                                                                                 #
-#   Análisis UNIVARIANTE               Análisis UNIVARIANTE                Análisis UNIVARIANTE   #
-#                                                                                                 #
+#   UNIVARIATE Analysis                UNIVARIATE Analysis                 UNIVARIATE Analysis    #
 ###################################################################################################
-'''
+"""
 
 
 def plot_multiple_categorical_distributions(df, categorical_columns, *, relative=False, show_values=True, rotation=45, palette='viridis') -> None:
-    '''
+    """
     Plot a bar-graphs matrix, with 2 columns and the rows needed to plot the
     `absolute` or `relative` frequency from the categorical columns of `df`.
     
@@ -95,7 +96,7 @@ def plot_multiple_categorical_distributions(df, categorical_columns, *, relative
         Colors to use for the different levels of the hue variable. 
         Should be something that can be interpreted by color_palette(), 
         or a dictionary mapping hue levels to matplotlib colors. 
-    '''
+    """
     num_columns = len(categorical_columns)
     num_rows = (num_columns // 2) + (num_columns % 2)
 
@@ -136,8 +137,8 @@ def plot_multiple_categorical_distributions(df, categorical_columns, *, relative
     plt.show()
 
 
-def plot_multiple_histograms_KDEs_boxplots(df, columns, *, kde=True, boxplot = True, whisker_width = 1.5, bins = None) -> None:
-    '''
+def plot_multiple_histograms_KDEs_boxplots(df, columns, *, kde=True, boxplot=True, whisker_width=1.5, bins=None) -> None:
+    """
     Plot histogram, KDE and Box-Plots in one figure, using `plt.subplots()` and `"Seaborn"`
     
     Parameters
@@ -159,7 +160,7 @@ def plot_multiple_histograms_KDEs_boxplots(df, columns, *, kde=True, boxplot = T
     
     bins : None or str, number, vector, or a pair of such values, optional
         Number of bins for the groups. Default is "auto".
-    '''
+    """
     num_columns = len(columns)
     if num_columns:
         if boxplot:
@@ -191,38 +192,67 @@ def plot_multiple_histograms_KDEs_boxplots(df, columns, *, kde=True, boxplot = T
         plt.show()
 
 
-def violinplot_multiple(df, columnas_numericas) -> None:
+def violinplot_multiple(df, numerical_columns) -> None:
     """
-    Muestra una matriz de diagramas de violín para las columnas numéricas especificadas de un DataFrame.
+    Displays a matrix of violin plots for the specified numerical columns of a DataFrame.
 
     Parameters
     ----------
     df : pd.DataFrame
-        DataFrame que contiene los datos.
+        The DataFrame containing the data.
         
-    columnas_numericas : list
-        Lista de nombres de las columnas numéricas.
+    numerical_columns : list
+        A list of numerical column names.
     """
-    num_cols = len(columnas_numericas)
+    num_cols = len(numerical_columns)
 
-    # Configurar el tamaño de la figura
+    # Configure the figure size
     plt.figure(figsize=(num_cols * 4, 4))
 
-    # Crear un diagrama de violín para cada columna numérica
-    for i, col in enumerate(columnas_numericas, 1):
+    # Create a violin plot for each numerical column
+    for i, col in enumerate(numerical_columns, 1):
         plt.subplot(1, num_cols, i)
         sns.violinplot(y=df[col])
         plt.title(col)
 
-    # Mostrar la matriz de diagramas de violín
+    # Show the matrix of violin plots
     plt.tight_layout()
     plt.show()
 
 
-def boxplot_multiple(df, columns, dim_matriz_visual = 2) -> None:
+def boxplot_multiple(df, columns, plot_per_row=2) -> None:
+    """
+    Generate a series of boxplots for specified numerical columns in a DataFrame.
+
+    This function displays multiple boxplots for a set of specified columns, 
+    organizing them in a grid format to enable easy visual comparison. The grid 
+    dimensions are determined by `dim_matriz_visual`, with each row containing 
+    up to this many plots.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        The DataFrame containing the data to be plotted.
+    columns : list of str
+        List of column names to plot. Only columns with numerical data types 
+        ('int64' or 'float64') will be plotted.
+    plot_per_row : int, optional, default=2
+        Number of plots per row in the grid.
+
+    Returns
+    -------
+    None
+        Displays the boxplots as a matplotlib figure but does not return any value.
+
+    Notes
+    -----
+    - Empty subplots are hidden if the grid is larger than the number of columns.
+    - This function is designed for exploratory data analysis, providing a quick 
+      way to assess the distribution and presence of outliers in multiple columns.
+    """
     num_cols = len(columns)
-    num_rows = num_cols // dim_matriz_visual + num_cols % dim_matriz_visual
-    fig, axes = plt.subplots(num_rows, dim_matriz_visual, figsize=(12, 6 * num_rows))
+    num_rows = num_cols // plot_per_row + num_cols % plot_per_row
+    fig, axes = plt.subplots(num_rows, plot_per_row, figsize=(12, 6 * num_rows))
     axes = axes.flatten()
 
     for i, column in enumerate(columns):
@@ -230,8 +260,8 @@ def boxplot_multiple(df, columns, dim_matriz_visual = 2) -> None:
             sns.boxplot(data=df, x=column, ax=axes[i])
             axes[i].set_title(column)
 
-    # Ocultar ejes vacíos
-    for j in range(i+1, num_rows * 2):
+    # Hide empty axes
+    for j in range(i + 1, num_rows * plot_per_row):
         axes[j].axis('off')
 
     plt.tight_layout()
@@ -239,7 +269,7 @@ def boxplot_multiple(df, columns, dim_matriz_visual = 2) -> None:
 
 
 def lineplot_multiple(df, numerical_serie_columns, *, all_together=False, start_date=None, end_date=None) -> None:
-    '''
+    """
     Lineplots of serie-style columns in the DataFrame.
 
     Parameters
@@ -258,7 +288,7 @@ def lineplot_multiple(df, numerical_serie_columns, *, all_together=False, start_
 
     end_date : str or pd.Timestamp, optional
         End date for the plot. Default is None (use all data).
-    '''
+    """
     # Redefine dataframe
     if start_date:
         df = df[df.index >= pd.to_datetime(start_date)]
@@ -301,82 +331,108 @@ def lineplot_multiple(df, numerical_serie_columns, *, all_together=False, start_
     plt.show()
 
 
-'''
+"""
 ###################################################################################################
-#                                                                                                 #
-#    Análisis BIVARIANTE                Análisis BIVARIANTE                 Análisis BIVARIANTE   #
-#                                                                                                 #
+#    BIVARIATE Analysis                 BIVARIATE Analysis                  BIVARIATE Analysis    #
 ###################################################################################################
-'''
 
-'''
 ##############################################
-#          Dos variables CATEGÓRICAS         #
+#          Categorical - Categorical         #
 ##############################################
-'''
+"""
 
-def plot_categorical_relationship(df, cat_col1, cat_col2, relative_freq=False, show_values=True, size_group = 5):
-    # Prepara los datos
+def plot_categorical_relationship(df, cat_col1, cat_col2, relative_freq=False, show_values=True, size_group=5):
+    """
+    Plots the relationship between two categorical variables using bar charts, optionally displaying relative frequencies 
+    and grouping categories if one of the variables has many levels.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        The DataFrame containing the data to plot.
+    cat_col1 : str
+        The name of the first categorical column (x-axis) to analyze.
+    cat_col2 : str
+        The name of the second categorical column (hue) to analyze.
+    relative_freq : bool, optional, default=False
+        If True, the function will plot relative frequencies instead of counts.
+    show_values : bool, optional, default=True
+        If True, the function will display the values on the bars.
+    size_group : int, optional, default=5
+        Number of unique categories of `cat_col1` to include in each plot if there are many categories.
+
+    Notes
+    -----
+    - If `cat_col1` has more than `size_group` unique categories, the function splits the data into multiple plots 
+      to improve readability.
+    - The function automatically adjusts between displaying counts and relative frequencies based on `relative_freq`.
+
+    Returns
+    -------
+    None
+        Displays one or multiple bar plots showing the relationship between `cat_col1` and `cat_col2`.
+    """
+    # Prepare the data
     count_data = df.groupby([cat_col1, cat_col2]).size().reset_index(name='count')
     total_counts = df[cat_col1].value_counts()
     
-    # Convierte a frecuencias relativas si se solicita
+    # Convert to relative frequencies if requested
     if relative_freq:
         count_data['count'] = count_data.apply(lambda x: x['count'] / total_counts[x[cat_col1]], axis=1)
 
-    # Si hay más de size_group categorías en cat_col1, las divide en grupos de size_group
+    # Split into groups if `cat_col1` has more than `size_group` categories
     unique_categories = df[cat_col1].unique()
     if len(unique_categories) > size_group:
         num_plots = int(np.ceil(len(unique_categories) / size_group))
 
         for i in range(num_plots):
-            # Selecciona un subconjunto de categorías para cada gráfico
+            # Select a subset of categories for each plot
             categories_subset = unique_categories[i * size_group:(i + 1) * size_group]
             data_subset = count_data[count_data[cat_col1].isin(categories_subset)]
 
-            # Crea el gráfico
+            # Create the plot
             plt.figure(figsize=(10, 6))
             ax = sns.barplot(x=cat_col1, y='count', hue=cat_col2, data=data_subset, order=categories_subset)
 
-            # Añade títulos y etiquetas
-            plt.title(f'Relación entre {cat_col1} y {cat_col2} - Grupo {i + 1}')
+            # Add titles and labels
+            plt.title(f'Relationship between {cat_col1} and {cat_col2} - Group {i + 1}')
             plt.xlabel(cat_col1)
-            plt.ylabel('Frecuencia' if relative_freq else 'Conteo')
+            plt.ylabel('Relative Frequency' if relative_freq else 'Count')
             plt.xticks(rotation=45)
 
-            # Mostrar valores en el gráfico
+            # Show values on the bars
             if show_values:
                 for p in ax.patches:
                     ax.annotate(f'{p.get_height():.2f}', (p.get_x() + p.get_width() / 2., p.get_height()),
                                 ha='center', va='center', fontsize=10, color='black', xytext=(0, size_group),
                                 textcoords='offset points')
 
-            # Muestra el gráfico
+            # Display the plot
             plt.show()
     else:
-        # Crea el gráfico para menos de size_group categorías
+        # Create the plot for fewer categories
         plt.figure(figsize=(10, 6))
         ax = sns.barplot(x=cat_col1, y='count', hue=cat_col2, data=count_data)
 
-        # Añade títulos y etiquetas
-        plt.title(f'Relación entre {cat_col1} y {cat_col2}')
+        # Add titles and labels
+        plt.title(f'Relationship between {cat_col1} and {cat_col2}')
         plt.xlabel(cat_col1)
-        plt.ylabel('Frecuencia' if relative_freq else 'Conteo')
+        plt.ylabel('Relative Frequency' if relative_freq else 'Count')
         plt.xticks(rotation=45)
 
-        # Mostrar valores en el gráfico
+        # Show values on the bars
         if show_values:
             for p in ax.patches:
                 ax.annotate(f'{p.get_height():.2f}', (p.get_x() + p.get_width() / 2., p.get_height()),
                             ha='center', va='center', fontsize=10, color='black', xytext=(0, size_group),
                             textcoords='offset points')
 
-        # Muestra el gráfico
+        # Display the plot
         plt.show()
 
 
 def plot_absolute_categorical_relationship_and_contingency_table(df, col1, col2):
-    '''
+    """
     This function takes a DataFrame and two categorical column names, then performs the following tasks:
     
     1. Draws a combination of graphs with the absolute frequencies of each categorical column using countplot.
@@ -407,7 +463,7 @@ def plot_absolute_categorical_relationship_and_contingency_table(df, col1, col2)
     
     result = plot_and_contingency_table(df, 'Category1', 'Category2')
     print(result)
-    '''
+    """
     fig, axs = plt.subplots(1, 2, figsize = (15, 5))
     
     # Countplot for the first categorical column
@@ -431,78 +487,140 @@ def plot_absolute_categorical_relationship_and_contingency_table(df, col1, col2)
     return contingency_table
 
 
-'''
+"""
 ##############################################
-#    Dos Variables: CATEGÓRICA + NUMÉRICA    #
+#          Categorical - Numerical           #
 ##############################################
-'''
+"""
 
 def plot_categorical_numerical_relationship(df, categorical_col, numerical_col, show_values=True, measure='mean', group_size=5):
-    # Calcula la medida de tendencia central (mean o median)
+    """
+    Displays a bar plot of the relationship between a categorical column and a numerical column, 
+    grouped by a specified measure of central tendency (mean or median). If there are more than 
+    a specified number of categories, plots will be divided into multiple groups.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        The DataFrame containing the data.
+    
+    categorical_col : str
+        The name of the categorical column.
+    
+    numerical_col : str
+        The name of the numerical column.
+    
+    show_values : bool, optional (default=True)
+        If True, displays the values on top of each bar in the plot.
+    
+    measure : str, optional (default='mean')
+        The measure of central tendency to use for the plot. Options are 'mean' or 'median'.
+    
+    group_size : int, optional (default=5)
+        The maximum number of categories to display per plot. If the number of categories 
+        exceeds this, multiple plots will be created, each containing up to group_size categories.
+    """
+    # Calculate central tendency measure (mean or median)
     if measure == 'median':
         grouped_data = df.groupby(categorical_col)[numerical_col].median()
     else:
-        # Por defecto, usa la media
+        # Default to mean
         grouped_data = df.groupby(categorical_col)[numerical_col].mean()
 
-    # Ordena los valores
+    # Sort values
     grouped_data = grouped_data.sort_values(ascending=False)
 
-    # Si hay más de group_size categorías, las divide en grupos de group_size
+    # If there are more than group_size categories, split into groups of group_size
     if grouped_data.shape[0] > group_size:
         unique_categories = grouped_data.index.unique()
         num_plots = int(np.ceil(len(unique_categories) / group_size))
 
         for i in range(num_plots):
-            # Selecciona un subconjunto de categorías para cada gráfico
+            # Select a subset of categories for each plot
             categories_subset = unique_categories[i * group_size:(i + 1) * group_size]
             data_subset = grouped_data.loc[categories_subset]
 
-            # Crea el gráfico
+            # Create the plot
             plt.figure(figsize=(10, 6))
             ax = sns.barplot(x=data_subset.index, y=data_subset.values)
 
-            # Añade títulos y etiquetas
-            plt.title(f'Relación entre {categorical_col} y {numerical_col} - Grupo {i + 1}')
+            # Add titles and labels
+            plt.title(f'Relationship between {categorical_col} and {numerical_col} - Group {i + 1}')
             plt.xlabel(categorical_col)
-            plt.ylabel(f'{measure.capitalize()} de {numerical_col}')
+            plt.ylabel(f'{measure.capitalize()} of {numerical_col}')
             plt.xticks(rotation=45)
 
-            # Mostrar valores en el gráfico
+            # Display values on the plot
             if show_values:
                 for p in ax.patches:
                     ax.annotate(f'{p.get_height():.2f}', (p.get_x() + p.get_width() / 2., p.get_height()),
                                 ha='center', va='center', fontsize=10, color='black', xytext=(0, 5),
                                 textcoords='offset points')
 
-            # Muestra el gráfico
+            # Show the plot
             plt.show()
     else:
-        # Crea el gráfico para menos de group_size categorías
+        # Create the plot for fewer than group_size categories
         plt.figure(figsize=(10, 6))
         ax = sns.barplot(x=grouped_data.index, y=grouped_data.values)
 
-        # Añade títulos y etiquetas
-        plt.title(f'Relación entre {categorical_col} y {numerical_col}')
+        # Add titles and labels
+        plt.title(f'Relationship between {categorical_col} and {numerical_col}')
         plt.xlabel(categorical_col)
-        plt.ylabel(f'{measure.capitalize()} de {numerical_col}')
+        plt.ylabel(f'{measure.capitalize()} of {numerical_col}')
         plt.xticks(rotation=45)
 
-        # Mostrar valores en el gráfico
+        # Display values on the plot
         if show_values:
             for p in ax.patches:
                 ax.annotate(f'{p.get_height():.2f}', (p.get_x() + p.get_width() / 2., p.get_height()),
                             ha='center', va='center', fontsize=10, color='black', xytext=(0, 5),
                             textcoords='offset points')
 
-        # Muestra el gráfico
+        # Show the plot
         plt.show()
 
 
-def boxplots_grouped(df, cat_col, num_col, group_size = 5):
+def boxplots_grouped(df, cat_col, num_col, group_size=5):
+    """
+    Displays grouped boxplots for a numerical column across subsets of a categorical column, 
+    divided into groups based on a specified group size.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        The DataFrame containing the data to be plotted.
+        
+    cat_col : str
+        The name of the categorical column used to group the data.
+        
+    num_col : str
+        The name of the numerical column for which the boxplots will be generated.
+        
+    group_size : int, optional (default=5)
+        The maximum number of unique categories to include in each plot. 
+        If the number of unique values in the categorical column exceeds this size, 
+        multiple boxplots will be created in separate groups.
+
+    Returns
+    -------
+    None
+        This function does not return any value. It displays grouped boxplots.
+        
+    Notes
+    -----
+    - This function is useful when the categorical column has many unique values, 
+      allowing for visualization in manageable subsets.
+    - Each plot will contain up to `group_size` categories, with the total number 
+      of plots dependent on the number of unique categories in `cat_col`.
+      
+    Example
+    -------
+    >>> boxplots_grouped(df=data, cat_col='Category', num_col='Value', group_size=4)
+    This will display boxplots of 'Value' for each subset of 4 unique values in 'Category'.
+    """
     unique_cats = df[cat_col].unique()
     num_cats = len(unique_cats)
-
 
     for i in range(0, num_cats, group_size):
         subset_cats = unique_cats[i:i+group_size]
@@ -516,7 +634,7 @@ def boxplots_grouped(df, cat_col, num_col, group_size = 5):
 
 
 def plot_histograms_by_categorical_numerical_relationship(df, cat_column, num_column):
-    '''
+    """ 
     Generate a grid of histograms to compare a categorical variable with a numerical variable.
     
     Parameters
@@ -542,7 +660,7 @@ def plot_histograms_by_categorical_numerical_relationship(df, cat_column, num_co
     })
     
     plot_histograms_by_categorical_numerical_relationship(df, 'Category', 'Numeric')
-    '''
+    """
     # Get unique categories in the categorical column
     categories = df[cat_column].unique()
     num_categories = len(categories)
@@ -580,7 +698,7 @@ def plot_histograms_by_categorical_numerical_relationship(df, cat_column, num_co
     plt.show()
 
 
-def plot_histograms_grouped(df, cat_col, num_col, group_size = 3):
+def plot_histograms_grouped(df, cat_col, num_col, group_size=3):
     """
     Plots grouped histograms for a numerical column based on unique categories from a categorical column.
 
@@ -623,162 +741,182 @@ def plot_histograms_grouped(df, cat_col, num_col, group_size = 3):
         plt.show()
 
 
-'''
+"""
 ##############################################
-#           Dos Variables NUMÉRICAS          #
+#           Numerical - Numerical            #
 ##############################################
-'''
+"""
 
 
-def scatterplot_with_correlation(df, columna_x, columna_y, tamano_puntos=50, mostrar_correlacion=True):
+def scatterplot_with_correlation(df, x_column, y_column, point_size=50, show_correlation=True):
     """
-    Crea un diagrama de dispersión entre dos columnas y opcionalmente muestra la correlación.
+    Creates a scatter plot between two columns and optionally displays the correlation coefficient.
 
     Parameters
     ----------
     df : pandas.DataFrame
-        DataFrame que contiene los datos.
+        DataFrame containing the data.
         
-    columna_x : str
-        Nombre de la columna para el eje X.
+    x_column : str
+        Name of the column for the X-axis.
         
-    columna_y : str
-        Nombre de la columna para el eje Y.
+    y_column : str
+        Name of the column for the Y-axis.
         
-    tamano_puntos : int, opcional
-        Tamaño de los puntos en el gráfico. Por defecto es 50.
+    point_size : int, optional
+        Size of the points in the plot. Default is 50.
         
-    mostrar_correlacion : bool, opcional
-        Si es True, muestra la correlación en el gráfico. Por defecto es False.
+    show_correlation : bool, optional
+        If True, displays the correlation coefficient on the plot. Default is False.
     """
 
     plt.figure(figsize=(10, 6))
-    sns.scatterplot(data=df, x=columna_x, y=columna_y, s=tamano_puntos)
+    sns.scatterplot(data=df, x=x_column, y=y_column, s=point_size)
 
-    if mostrar_correlacion:
-        correlacion = df[[columna_x, columna_y]].corr().iloc[0, 1]
-        plt.title(f'Diagrama de Dispersión con Correlación: {correlacion:.2f}')
+    if show_correlation:
+        correlation = df[[x_column, y_column]].corr().iloc[0, 1]
+        plt.title(f'Scatter Plot with Correlation: {correlation:.2f}')
     else:
-        plt.title('Diagrama de Dispersión')
+        plt.title('Scatter Plot')
 
-    plt.xlabel(columna_x)
-    plt.ylabel(columna_y)
+    plt.xlabel(x_column)
+    plt.ylabel(y_column)
     plt.grid(True)
     plt.show()
 
 
-'''
+"""
 ###################################################################################################
-#                                                                                                 #
-#    Análisis MULTIVARIANTE           Análisis MULTIVARIANTE            Análisis MULTIVARIANTE    #
-#                                                                                                 #
+#    MULTIVARIATE Analysis            MULTIVARIATE Analysis             MULTIVARIATE Analysis     #
 ###################################################################################################
-'''
-'''
-##############################################
-#           3 Categorical Variables          #
-##############################################
-'''
 
-# Función de Alberto. S07, U02, Práctica obligatoria
-def plot_tricategorical_analysis(df, direct_cat_col, cat_col1, cat_col2, relative = False, show_values = True):
-    '''   
+##############################################
+#         Three Categorical Variables        #
+##############################################
+"""
+
+# Alberto Romero Vázquez function. From DS Bootcamp, Sprint 7, Unit 2.
+def plot_tricategorical_analysis(df, direct_cat_col, cat_col1, cat_col2, relative=False, show_values=True):
+    """ 
+    Analyzes and plots the relationship among three categorical variables.
+
+    This function creates a dictionary to separate the DataFrame into subsets based on unique values 
+    in the specified `direct_cat_col` column. It then plots the relationship between two other categorical columns 
+    (`cat_col1` and `cat_col2`) within each subset.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        The DataFrame containing the data.
+        
+    direct_cat_col : str
+        The main categorical column used to separate the data into subsets.
+        
+    cat_col1 : str
+        The first categorical column to plot within each subset.
+        
+    cat_col2 : str
+        The second categorical column to plot within each subset.
+        
+    relative : bool, optional
+        If True, shows relative frequencies in the plot. Default is False.
+        
+    show_values : bool, optional
+        If True, displays values on the plot. Default is True.
+
     Example
     -------
-    plot_tricategorical_analysis(df_titanic, "class", ["alive","who"])
-    '''
-
-    diccionario_multivariante = {}
-    for valor in df[direct_cat_col].unique():
-        diccionario_multivariante[valor] = df.loc[df[direct_cat_col] == valor,[cat_col2,cat_col1]] 
-
-    for valor,df_datos in diccionario_multivariante.items():
-        print(f"Respuesta {valor}:")
-        plot_categorical_relationship(df_datos,cat_col2,cat_col1, relative_freq= relative, show_values= show_values)
-
-'''
-##############################################
-#     2 Numeric, 1 Categorical Variables     #
-##############################################
-'''
-
-def bubleplot(df, col_x, col_y, col_size, scale = 1000):
+    plot_tricategorical_analysis(df_titanic, "class", "alive", "who")
     """
-    Crea un scatter plot usando dos columnas para los ejes X e Y,
-    y una tercera columna para determinar el tamaño de los puntos.
+    tricategorical_dict = {}
+    for value in df[direct_cat_col].unique():
+        tricategorical_dict[value] = df.loc[df[direct_cat_col] == value, [cat_col2, cat_col1]]
+
+    for value, df_subset in tricategorical_dict.items():
+        print(f"Category {value}:")
+        plot_categorical_relationship(df_subset, cat_col2, cat_col1, relative_freq=relative, show_values=show_values)
+
+
+"""
+##############################################
+#  Two Numerical, One Categorical Variables  #
+##############################################
+"""
+
+def bubbleplot(df, col_x, col_y, col_size, scale=1000):
+    """
+    Creates a scatter plot using two columns for the X and Y axes, 
+    and a third column to determine the size of the points.
 
     Parameters
     ----------
     df : pd.DataFrame
-        DataFrame de pandas.
+        Pandas DataFrame containing the data.
         
     col_x : str
-        Nombre de la columna para el eje X.
+        Name of the column for the X-axis.
         
     col_y : str
-        Nombre de la columna para el eje Y.
+        Name of the column for the Y-axis.
         
     col_size : str
-        Nombre de la columna para determinar el tamaño de los puntos.
+        Name of the column that determines the size of the points.
+        
+    scale : int, optional
+        Scaling factor to adjust the size of the bubbles. Default is 1000.
     """
-
-    # Asegúrate de que los valores de tamaño sean positivos
-    sizes = (df[col_size] - df[col_size].min() + 1)/scale
+    
+    # Ensure that size values are positive
+    sizes = (df[col_size] - df[col_size].min() + 1) / scale
 
     plt.scatter(df[col_x], df[col_y], s=sizes)
     plt.xlabel(col_x)
     plt.ylabel(col_y)
-    plt.title(f'Burbujas de {col_x} vs {col_y} con Tamaño basado en {col_size}')
+    plt.title(f'Bubble Plot of {col_x} vs {col_y} with Size based on {col_size}')
     plt.show()
 
 
-def scatterplot_3variables(df, col_num1, col_num2, col_cat):
+def scatterplot_3_variables(df, col_num1, col_num2, col_cat):
     """
-    Genera scatter plots superpuestos de dos columnas numéricas, 
-    agrupados y coloreados según una columna categórica.
+    Generates scatter plots of two numerical columns, grouped and colored by a categorical column.
 
     Parameters
     ----------
     df : pd.DataFrame
-        DataFrame que contiene los datos.
+        DataFrame containing the data.
         
     col_num1 : str
-        Nombre de la primera columna numérica para el eje X.
+        Name of the first numerical column for the X-axis.
         
     col_num2 : str
-        Nombre de la segunda columna numérica para el eje Y.
+        Name of the second numerical column for the Y-axis.
         
     col_cat : str
-        Nombre de la columna categórica para agrupar y colorear los datos.
+        Name of the categorical column used to group and color the data.
     """
-    # Configuración para mejorar la estética del gráfico
+    # Setting to improve the aesthetics of the plot
     sns.set(style="whitegrid")
 
     plt.figure(figsize=(10, 8))
 
-    # Usar seaborn para generar los scatter plots agrupados y coloreados
+    # Using seaborn to generate grouped and colored scatter plots
     sns.scatterplot(x=col_num1, y=col_num2, hue=col_cat, data=df, palette="viridis")
 
-    # Añadir título y etiquetas
-    plt.title(f'{col_num1} vs {col_num2} Scatterplot, gruoped by {col_cat}')
+    # Add title and labels
+    plt.title(f'{col_num1} vs {col_num2} Scatter Plot, grouped by {col_cat}')
     plt.xlabel(col_num1)
     plt.ylabel(col_num2)
 
-    # Mostrar leyenda y gráfico
+    # Show legend and plot
     plt.legend(title=col_cat)
     plt.show()
 
-    # Uso de la función
-    # df es tu DataFrame
-    # scatter_plots_agrupados(df, 'nombre_columna_categoria', 'nombre_columna_num1', 'nombre_columna_num2')
-    return
 
-
-'''
+"""
 ##############################################
-#                 4 Variables                #
+#               Four Variables               #
 ##############################################
-'''
+"""
 
 def scatterplot(df, num_col1, num_col2, cat_col=None, point_size=50, scale=1, show_legend=True):
     """
@@ -851,13 +989,11 @@ def scatterplot(df, num_col1, num_col2, cat_col=None, point_size=50, scale=1, sh
     plt.show()
     
  
-'''
+"""
 ###################################################################################################
-#                                                                                                 #
 #    DL Image Processing                DL Image Processing                 DL Image Processing   #
-#                                                                                                 #
 ###################################################################################################
-'''
+"""
  
  
 def show_images_batch(images, titles=[], n_cols=5, size_scale=2, cmap="Greys"):
