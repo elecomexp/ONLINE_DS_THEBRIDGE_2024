@@ -9,6 +9,7 @@ source entorno_virtual/bin/activate --> activar entorno virtual en MAC
 deactivate --> Desactivar el entorno virtual (a secas, sin nada por delante)
 
 virtualenv entorno_virtual -p path\to\new_python.exe --> Crear un entorno virtual con una versión especifíca de python
+virtualenv .venv_iris -p C:/Users/Lander/AppData/Local/Programs/Python/Python310/python.exe --> Ejemplo de versión 3.10
 
 pip install libreria==3.0.2     --> Instala versiones en concreto
 pip install libreria<=3.0.2     --> Instala la primera versión por debajo de
@@ -21,3 +22,17 @@ pip freeze > requirements.txt --> exportar los nombres de las librerías instala
 pip uninstall -r requirements.txt -y --> desinstalar todas las librerías del requirements.txt. Aplicable tanto a tu ordenador como a tu entorno virtual.
 
 streamlit run main.py  --> Desde la terminal "git bash" y con el entorno virtual activado
+
+
+=============================================================================
+
+BASH PythonAnywhere
+
+mkvirtualenv --python=/usr/bin/python3.10 venv --> Crear entorno virtual con versión concreta de Python
+
+workon venv --> Activar entorno
+deactivate --> Desactivar entorno
+
+workon --> Listar todos los entornos virtuales disponibles
+rmvirtualenv venv_iris --> Eliminar un entorno virtual
+
