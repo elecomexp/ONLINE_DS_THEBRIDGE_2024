@@ -1,3 +1,11 @@
+"""
+functions.py
+
+Author: Lander Combarro Exposito
+Created: October 17, 2024
+Last Modified: October 17, 2024
+"""
+
 import os
 import shutil
 import zipfile
