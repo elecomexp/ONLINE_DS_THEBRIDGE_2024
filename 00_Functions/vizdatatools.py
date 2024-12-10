@@ -2,8 +2,8 @@
 vizdatatools.py
 
 Author: Lander Combarro Exposito
-Created: 2024/07/17
-Last Modified: 2024/11/18
+Created: July 17, 2024
+Last Modified: November 18, 2024
 
 Description
 -----------
