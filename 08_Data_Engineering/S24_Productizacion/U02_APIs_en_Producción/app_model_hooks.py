@@ -108,21 +108,11 @@ def webhook():
                 subprocess.run(
                     ["touch", servidor_web], check=True
                 )  # Trick to automatically reload PythonAnywhere WebServer
-                return jsonify(
-                    {"message": f"Se realizó un git pull en el repositorio {repo_name}"}
-                ), 200
+                return jsonify({"message": f"Se realizó un git pull en el repositorio {repo_name}"}), 200
             except subprocess.CalledProcessError:
-                return jsonify(
-                    {
-                        "message": f"Error al realizar git pull en el repositorio {repo_name}"
-                    }
-                ), 500
+                return jsonify({"message": f"Error al realizar git pull en el repositorio {repo_name}"}), 500
         else:
-            return jsonify(
-                {
-                    "message": "No se encontró información sobre el repositorio en la carga útil (payload)"
-                }
-            ), 400
+            return jsonify({"message": "No se encontró información sobre el repositorio en la carga útil (payload)"}), 400
     else:
         return jsonify({"message": "La solicitud no contiene datos JSON"}), 400
 
