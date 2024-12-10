@@ -1,3 +1,11 @@
+"""
+console.py
+
+Author: Lander Combarro Exposito
+Created: October 18, 2024
+Last Modified: October 18, 2024
+"""
+
 import os
 import shutil
 import zipfile
